@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-Stack Telemetry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <style>
+        :root {
+            --cloud: #00f3ff; --waf: #00d4ff; --edge: #00b2ff; --nta: #0090ff; 
+            --ips: #006eff; --sandbox: #004cff; --dlp: #002aff; --ztna: #0008ff; --core: #0000cc;
+            --primary: #00e5ffd1; --danger: #ff1744; --warning: #ffea00; --vigour: #00e5ff; --apt: #ff0055;     
+            --bg-glass: rgba(12, 2, 3, 0.92); --border-glass: rgba(255, 0, 34, 0.25); --glow: 0 0 15px rgba(0, 225, 255, 0.4);
+        }
+
+        /* --- BACKGROUND: AI NEURAL CORE --- */
+        @keyframes dataRain {
+            0% { background-position: 0px 0px, 0px 0px, 0px 0px; }
+            100% { background-position: 0px 1000px, 0px 800px, 0px 400px; }
+        }
+        html, body { width: 100vw; height: 100vh; margin: 0; padding: 0; }
+        body { overflow: hidden; background-color: #010308 !important; color: #fff; font-family: 'Rajdhani', sans-serif; user-select: none; cursor: crosshair; }
+        
+        /* The Fiber Optic Data Streams */
+        body::before { content: ""; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-image: linear-gradient(180deg, rgba(0, 243, 255, 0) 0%, rgba(0, 243, 255, 0.15) 50%, rgba(0, 243, 255, 0) 100%), linear-gradient(180deg, rgba(0, 100, 255, 0) 0%, rgba(0, 100, 255, 0.1) 50%, rgba(0, 100, 255, 0) 100%), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px); background-size: 3px 200px, 5px 400px, 40px 100%; z-index: 0; pointer-events: none; animation: dataRain 8s linear infinite; }
+        /* Subtle static hex/grid overlay for texture */
+        body::after { content: ""; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-image: radial-gradient(rgba(0, 243, 255, 0.08) 1px, transparent 1px); background-size: 20px 20px; z-index: 0; pointer-events: none; }
+
+        /* --- UI STYLES FOR TELEMETRY --- */
+        @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } 100% { transform: translate(0) } }
+        @keyframes pulse-glow { 0% { box-shadow: 0 0 10px var(--danger); } 50% { box-shadow: 0 0 35px var(--danger); } 100% { box-shadow: 0 0 10px var(--danger); } }
+        .critical-glitch { animation: glitch 0.2s linear infinite; filter: saturate(200%) contrast(140%); }
+        .damage-shake { animation: glitch 0.15s linear infinite; }
+        #ui-toggle-btn { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; background: var(--bg-glass); border: 1px solid var(--primary); color: var(--primary); padding: 8px 30px; font-family: 'Share Tech Mono'; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,229,255,0.2); clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+        #ui-toggle-btn:hover { background: var(--primary); color: #000; box-shadow: var(--glow); }
+        .ui-container { transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .ui-hidden { opacity: 0; pointer-events: none; transform: scale(0.92) translateY(-20px); }
+        .glass-panel { position: absolute; z-index: 100; background: linear-gradient(135deg, rgba(2, 5, 12, 0.9), rgba(1, 2, 5, 0.95)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-top: 3px solid var(--primary); box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 40px rgba(0, 229, 255, 0.03); padding: 22px; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 12px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%); }
+        #dashboard { top: 60px; left: 30px; width: 380px; max-height: calc(100vh - 80px); overflow-y: auto;}
+        #hud { top: 60px; right: 30px; width: 360px; max-height: calc(100vh - 80px); overflow-y: auto; }
+        #zoom-container { position: absolute; bottom: 45px; left: 30px; z-index: 100; background: var(--bg-glass); padding: 10px 15px; border: 1px solid var(--border-glass); border-left: 3px solid var(--primary); display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--primary); }
+        #zoomSlider { width: 150px; cursor: pointer; accent-color: var(--primary); }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); } ::-webkit-scrollbar-thumb { background: var(--primary); }
+        h1 { margin: 0; font-size: 26px; color: #fff; text-transform: uppercase; letter-spacing: 3px; padding-bottom: 10px; text-shadow: 0 0 8px rgba(0,229,255,0.6); position: relative;}
+        h1::after { content: ''; position: absolute; bottom: 0; left: 0; width: 50px; height: 2px; background: var(--primary); box-shadow: var(--glow);}
+        h2 { font-size: 12px; color: #90a4ae; margin: 0; letter-spacing: 2px; text-transform: uppercase; font-weight: 700;}
+        label { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #cfd8dc; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
+        select { width: 100%; padding: 10px; background: rgba(0, 0, 0, 0.6); color: var(--primary); border: 1px solid rgba(0,229,255,0.3); font-size: 14px; font-weight: 600; cursor: pointer; outline: none; font-family: 'Share Tech Mono', monospace; transition: 0.3s;}
+        select:hover { background: rgba(0, 229, 255, 0.1); border-color: var(--primary); box-shadow: var(--glow); }
+        select option { background: #060a14; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px;}
+        button { padding: 10px 6px; background: rgba(10, 18, 35, 0.6); color: #fff; border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 2px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s all; font-family: 'Rajdhani', sans-serif; }
+        button:hover:not(:disabled) { transform: translateY(-2px); background: rgba(0, 229, 255, 0.1); box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        button:active:not(:disabled) { transform: translateY(1px); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; background: rgba(255,255,255,0.05); border-color: #333; color: #777;}
+        .btn-tac { color: #81d4fa; } .btn-tac:hover:not(:disabled) { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 229, 255, 0.3); color: #fff; text-shadow: 0 0 5px var(--primary);} .btn-tac.active { background: rgba(0, 229, 255, 0.2); color: var(--primary); border-color: var(--primary); box-shadow: var(--glow); }
+        .btn-ult { grid-column: span 2; color: #ffb300; border-color: rgba(255, 179, 0, 0.3);} .btn-ult:hover:not(:disabled) { border-color: #ffb300; background: rgba(255, 179, 0, 0.1); box-shadow: 0 0 15px rgba(255, 179, 0, 0.3); color: #fff; text-shadow: 0 0 5px #ffb300;}
+        .btn-code { grid-column: span 2; color: #00e5ff; font-weight: 700; background: rgba(0, 229, 255, 0.05); border-color: rgba(0, 229, 255, 0.5);} .btn-code:hover:not(:disabled) { background: rgba(0, 229, 255, 0.2); text-shadow: 0 0 10px var(--primary); box-shadow: inset 0 0 15px rgba(0, 229, 255, 0.4), 0 0 15px rgba(0, 229, 255, 0.4); border-color: var(--primary);}
+        .hud-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #b0bec5;}
+        .hud-val { font-family: 'Share Tech Mono', monospace; font-size: 13px; font-weight: bold; text-shadow: 0 0 6px currentColor; padding: 2px 0; }
+        #terminal { background: rgba(2,5,12,0.8); border: 1px solid rgba(255,255,255,0.05); border-radius: 2px; padding: 10px; height: 100px; overflow-y: auto; font-family: 'Share Tech Mono', monospace; font-size: 11px; line-height: 1.4; color: #90a4ae; display: flex; flex-direction: column-reverse; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);}
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 2px;}
+        .log-time { color: #546e7a; margin-right: 6px;}
+        .log-warn { color: var(--warning); text-shadow: 0 0 4px var(--warning);} .log-crit { color: var(--danger); font-weight: bold; text-shadow: 0 0 4px var(--danger);} .log-sys { color: var(--primary); } .log-vigour { color: var(--vigour); font-weight: bold; text-shadow: 0 0 5px var(--vigour);}
+        .status-ok { color: var(--primary); } .status-warn { color: var(--warning); } .status-crit { color: var(--danger); animation: pulse-glow 1s infinite;}
+        .switch { position: relative; display: inline-block; width: 36px; height: 18px; } .switch input { opacity: 0; width: 0; height: 0; } .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 9px;} .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: #78909c; transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1); border-radius: 50%;} input:checked + .slider { background-color: rgba(0, 229, 255, 0.2); border: 1px solid var(--primary);} input:checked + .slider:before { transform: translateX(18px); background-color: var(--primary); box-shadow: 0 0 8px var(--primary);}
+        #codebreaker { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 450px; z-index: 500; background: rgba(2, 5, 12, 0.95); border: 1px solid var(--primary); box-shadow: 0 0 50px rgba(0, 229, 255, 0.2); text-align: center; backdrop-filter: blur(10px); padding: 30px;}
+        .cb-header { border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 15px; margin-bottom: 20px;} .cb-header h1 { color: var(--primary); font-size: 22px; border: none; padding: 0; text-shadow: 0 0 10px var(--primary); } .cb-header h1::after { display: none; }
+        .cb-target { font-family: 'Share Tech Mono', monospace; font-size: 22px; letter-spacing: 4px; color: #fff; margin: 20px 0; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 4px; border: 1px solid rgba(0, 229, 255, 0.2);} .cb-target span { margin: 0 6px; padding: 4px 6px; border-bottom: 2px solid #555; transition: 0.3s;} .cb-target span.found { color: var(--primary); border-color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+        .hex-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 20px;} .hex-cell { background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); padding: 14px 0; border-radius: 2px; font-family: 'Share Tech Mono', monospace; font-size: 15px; color: #90a4ae; cursor: pointer; transition: 0.2s;} .hex-cell:hover { background: rgba(0, 229, 255, 0.15); border-color: var(--primary); color: #fff; transform: scale(1.05); z-index: 10; box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);} .hex-cell.active { background: var(--primary); color: #000; border-color: var(--primary); pointer-events: none;} .hex-cell.error { background: var(--danger); color: #fff; border-color: var(--danger); box-shadow: 0 0 15px var(--danger);}
+        .cb-footer { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #90a4ae; font-weight: bold; letter-spacing: 1px;} #cbTimer { color: var(--warning); font-family: 'Share Tech Mono'; font-size: 18px;}
+        .ticker-wrap { width: 100%; overflow: hidden; background-color: rgba(2, 5, 12, 0.9); border-top: 1px solid var(--primary); border-bottom: 1px solid var(--primary); position: absolute; bottom: 0; left: 0; z-index: 1000; padding: 4px 0;} .ticker { display: inline-block; white-space: nowrap; animation: ticker 30s linear infinite; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #cfd8dc; } @keyframes ticker { 0% { transform: translate3d(100vw, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } } .ticker-item { margin-right: 50px; } .t-crit { color: var(--danger); font-weight: bold; } .t-cve { color: var(--warning); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <button id="ui-toggle-btn">TOGGLE TELEMETRY UI (U)</button>
+
+    <div id="zoom-container" class="ui-container">
+        SYSTEM DEPTH ZOOM: 
+        <input type="range" id="zoomSlider" min="5" max="350" value="200">
+    </div>
+
+    <div id="codebreaker" class="glass-panel">
+        <div class="cb-header">
+            <h1>V.I.G.O.U.R. DECRYPTION</h1>
+            <h2 style="color: var(--primary);">Passage Code Pathways Active</h2>
+        </div>
+        <div style="font-size: 12px; color:#cfd8dc; letter-spacing: 1px;">ISOLATE TARGET SEQUENCE IN DATASET</div>
+        <div class="cb-target" id="cbTargetDisplay"></div>
+        <div class="hex-grid" id="cbGrid"></div>
+        <div class="cb-footer">
+            <span>DATASET VOLATILITY: HIGH</span>
+            <span id="cbTimer">15.00s</span>
+            <button onclick="closeCodebreaker()" style="border:1px solid #555; width: auto; padding: 6px 15px;">ABORT (ESC)</button>
+        </div>
+    </div>
+
+    <div id="ui-wrapper" class="ui-container">
+        <div id="dashboard" class="glass-panel">
+            <h1>Omni-Stack Director</h1>
+            
+            <div style="background: rgba(0,229,255,0.05); padding: 10px; border: 1px solid rgba(0,229,255,0.2); margin-bottom: 5px; border-radius: 2px;">
+                <label style="margin: 0; color: var(--warning);">
+                    SOAR Auto-Remediation AI
+                    <label class="switch">
+                        <input type="checkbox" id="soarToggle">
+                        <span class="slider"></span>
+                    </label>
+                </label>
+                <div style="font-size: 11px; color: #90a4ae; margin-top: 8px; font-family: 'Share Tech Mono';">
+                    PLAYBOOK: <span id="soarStatus" style="color: #78909c;">OFFLINE</span>
+                </div>
+            </div>
+
+            <div>
+                <label>Threat Vector Simulator
+                    <div style="display:flex; align-items:center; gap:8px; font-size: 11px; color:var(--primary);">
+                        AUTO-PILOT
+                        <label class="switch">
+                            <input type="checkbox" id="autoPilotToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </label>
+                <select id="attackSelect">
+                    <option value="NORMAL">Standard Operations</option>
+                    <option value="DDOS">Volumetric DDoS (External)</option>
+                    <option value="BRUTE">Targeted Brute-Force</option>
+                    <option value="INJECT">Malware / Payload Injection</option>
+                    <option value="APT">Advanced Persistent Threat</option>
+                    <option value="INSIDER">Insider Compromise (IAM)</option>
+                    <option value="EXFIL">Data Exfiltration</option>
+                    <option value="RANSOM">Ransomware Swarm</option>
+                </select>
+            </div>
+
+            <div>
+                <h2 style="margin-bottom: 8px;">Active Countermeasures</h2>
+                <div class="btn-grid">
+                    <button id="btnInterceptor" class="btn-tac">[1] EDR Interceptors</button>
+                    <button id="btnDeepScan" class="btn-tac">[2] Holographic Scan</button>
+                    <button id="btnHoneypot" class="btn-tac">[3] Deploy Decoy</button>
+                    <button id="btnSignatures" class="btn-tac">[4] Update Signatures</button>
+                    <button id="btnBlackhole" class="btn-ult">[5] BGP Null Route</button>
+                    <button id="btnQuantum" class="btn-ult">[6] Quantum Boost Sync</button>
+                    <button id="btnEMP" class="btn-code">[7] E.M.P. Isolation</button>
+                    <button id="btnVigour" class="btn-code">[8] Init V.I.G.O.U.R.</button>
+                </div>
+            </div>
+
+            <button id="btnRepair" style="background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--primary); width: 100%; font-size: 13px;">System Hard Reboot</button>
+        </div>
+
+        <div id="hud" class="glass-panel">
+            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px;">System Status</h2>
+
+            <div style="display:flex; justify-content:space-between; align-items: center;">
+                <div class="hud-row">Load: <span class="hud-val status-ok" id="hudLoad" style="color: var(--primary);">12%</span></div>
+                <div class="hud-row">Uptime: <span class="hud-val" id="hudTime" style="color: #fff;">00:00</span></div>
+                <div class="hud-row">Purged: <span class="hud-val" id="hudPurged" style="color: var(--primary);">0</span></div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 2px; margin-top: 8px;">
+                <div class="hud-row">Data Core: <span class="hud-val status-ok" id="hudServer">SECURE</span></div>
+                <div class="hud-row">Vault Volume: <span class="hud-val" id="dashboard-vault-data" style="color: var(--primary); text-shadow: 0 0 8px var(--primary);">10000 TB</span></div>
+                <div class="hud-row" style="color: #78909c; font-size:11px;">Vault Status: <span class="hud-val status-ok" id="dashboard-vault-status" style="font-size:12px;">[ SECURE ]</span></div>
+                <div class="hud-row" style="color: #78909c; font-size:11px; margin-top: 4px;">Threat: <span class="hud-val status-ok" id="hudThreat" style="text-shadow:none; font-size:12px;">None</span></div>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 8px;">
+                    <h2 style="margin: 0; font-size: 11px;">NETWORK INGRESS (Gbps)</h2>
+                </div>
+                <canvas id="trafficGraph" width="310" height="30" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(0,229,255,0.1); border-radius: 2px;"></canvas>
+            </div>
+
+            <div style="background: rgba(178, 102, 255, 0.1); padding: 8px; border-radius: 2px; margin-top: 10px; border-left: 2px solid #b266ff;">
+                <div class="hud-row" style="color: #b266ff;">SOC Uplink: <span class="hud-val status-ok" id="socStatus">TIER 1 - SECURE</span></div>
+                <div class="hud-row" style="color: #78909c; font-size:11px;">Analysts Online: <span class="hud-val" id="socAnalysts" style="color:#fff;">3</span></div>
+            </div>
+
+            <div style="margin-top: 8px;">
+                <h2 style="margin-bottom: 4px; font-size: 11px;">SIEM Event Log</h2>
+                <div id="terminal">
+                    <div class="log-entry"><span class="log-time">[SYS]</span> <span class="log-sys">Listening for Python Backend...</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="ticker-item"><span class="t-cve">CVE-2026-1044:</span> Zero-day detected in major hypervisors. Patching initiated.</span>
+            <span class="ticker-item"><span class="t-crit">GLOBAL ALERT:</span> Ransomware syndicate 'DarkCollar' targeting financial sectors.</span>
+            <span class="ticker-item"><span class="t-cve">INTEL FEED:</span> Botnet activity originating from AS45090 spiking 400%.</span>
+            <span class="ticker-item">SOAR Playbook definitions updated from MITRE ATT&CK v15.</span>
+            <span class="ticker-item"><span class="t-cve">NODE STATUS:</span> Quantum keys rotated successfully across 9 regions.</span>
+        </div>
+    </div>
+
+    <script>
+        // --- WEB SOCKET SETUP ---
+        // Replacing BroadcastChannel with Socket.IO to talk to Python
+        const socket = io('http://127.0.0.1:5000');
+        let currentMode = 'NORMAL';
+
+        document.getElementById('ui-toggle-btn').addEventListener('click', function() {
+            document.getElementById('ui-wrapper').classList.toggle('ui-hidden');
+            document.getElementById('zoom-container').classList.toggle('ui-hidden');
+            if(document.getElementById('ui-wrapper').classList.contains('ui-hidden')) {
+                this.innerText = "OPEN TELEMETRY UI (U)";
+                this.style.background = "var(--primary)"; this.style.color = "#000";
+            } else {
+                this.innerText = "TOGGLE TELEMETRY UI (U)";
+                this.style.background = "var(--bg-glass)"; this.style.color = "var(--primary)";
+            }
+        });
+
+        const canvas = document.getElementById('trafficGraph');
+        const ctx = canvas.getContext('2d');
+        let graphData = new Array(60).fill(10); 
+
+        function updateGraph(isAttacked) {
+            graphData.shift();
+            let newVal = isAttacked ? 70 + Math.random() * 30 : 5 + Math.random() * 15;
+            graphData.push(newVal);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - (graphData[0] / 100) * canvas.height);
+            for(let i = 1; i < graphData.length; i++) {
+                let x = (i / graphData.length) * canvas.width;
+                let y = canvas.height - (graphData[i] / 100) * canvas.height;
+                ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = isAttacked ? '#ff1744' : '#00e5ff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.fillStyle = isAttacked ? 'rgba(255, 23, 68, 0.15)' : 'rgba(0, 229, 255, 0.15)';
+            ctx.fill();
+        }
+
+        const terminal = document.getElementById('terminal');
+        function localLog(msg, type="sys") {
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: "numeric", minute: "numeric", second: "numeric" });
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            let colorClass = 'log-sys';
+            if (type === 'warn') colorClass = 'log-warn';
+            else if (type === 'crit') colorClass = 'log-crit';
+            else if (type === 'vigour') colorClass = 'log-vigour';
+            div.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
+            terminal.prepend(div);
+            if(terminal.children.length > 30) terminal.removeChild(terminal.lastChild);
+        }
+
+        // --- EMIT EVENTS TO PYTHON SERVER ---
+        document.getElementById('zoomSlider').addEventListener('input', e => socket.emit('omni_sync', {cmd: 'zoom', val: e.target.value}));
+        document.getElementById('attackSelect').addEventListener('change', e => socket.emit('omni_sync', {cmd: 'setMode', val: e.target.value}));
+        document.getElementById('autoPilotToggle').addEventListener('change', e => socket.emit('omni_sync', {cmd: 'setAutoPilot', val: e.target.checked}));
+        document.getElementById('soarToggle').addEventListener('change', e => socket.emit('omni_sync', {cmd: 'setSoar', val: e.target.checked}));
+        
+        ['btnInterceptor', 'btnDeepScan', 'btnHoneypot', 'btnSignatures', 'btnBlackhole', 'btnQuantum', 'btnEMP', 'btnRepair'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function() {
+                socket.emit('omni_sync', {cmd: 'btnClick', id: id});
+                if(id==='btnInterceptor' || id==='btnDeepScan') this.classList.toggle('active');
+            });
+        });
+
+        // --- LISTEN FOR DATA FROM PYTHON SERVER ---
+        socket.on('omni_sync', (data) => {
+            if (data.type === 'log') {
+                localLog(data.msg, data.logType);
+            } else if (data.type === 'zoomUpdate') {
+                document.getElementById('zoomSlider').value = data.val;
+            } else if (data.type === 'syncMode') {
+                currentMode = data.mode;
+                document.getElementById('attackSelect').value = data.mode;
+                if(data.color) document.documentElement.style.setProperty('--primary', data.color);
+                if(data.autoPilot !== undefined) document.getElementById('autoPilotToggle').checked = data.autoPilot;
+            } else if (data.type === 'hudUpdate') {
+                document.getElementById('hudLoad').innerText = data.loadTxt; document.getElementById('hudLoad').className = data.loadClass;
+                document.getElementById('hudTime').innerText = data.time; document.getElementById('hudPurged').innerText = data.purged;
+                document.getElementById('hudThreat').innerText = data.threatTxt; document.getElementById('hudThreat').style.color = data.threatColor;
+                document.getElementById('hudServer').innerText = data.serverTxt; document.getElementById('hudServer').className = data.serverClass;
+                
+                document.getElementById('soarStatus').innerText = data.soarText;
+                document.getElementById('soarStatus').style.color = data.soarColor;
+                document.getElementById('socStatus').innerText = data.socText;
+                document.getElementById('socStatus').className = data.socClass;
+                document.getElementById('socAnalysts').innerText = data.socAnalysts;
+
+                updateGraph(data.mode !== 'NORMAL');
+                
+                if (data.glitch) document.body.classList.add('critical-glitch'); else document.body.classList.remove('critical-glitch');
+                if (data.shake) { let d = document.getElementById('dashboard'); d.classList.add('damage-shake'); setTimeout(() => d.classList.remove('damage-shake'), 150); }
+                
+                if(data.layers) {
+                    data.layers.forEach(update => {
+                        let txt = document.getElementById('txt' + update.layer.charAt(0).toUpperCase() + update.layer.slice(1));
+                        let bar = document.getElementById('bar' + update.layer.charAt(0).toUpperCase() + update.layer.slice(1));
+                        
+                        if(txt && bar) {
+                            txt.innerText = update.pctText + (update.pctText === "OFFLINE" ? "" : "%"); 
+                            txt.className = update.txtClass;
+                            bar.style.width = update.pctText === "OFFLINE" ? "0%" : update.pctWidth + "%"; 
+                            bar.style.backgroundColor = update.barColor; 
+                            bar.style.boxShadow = update.barShadow;
+                        }
+                    });
+                }
+            } else if (data.type === 'btnState') {
+                if(data.disableAll !== undefined) document.querySelectorAll('.btn-tac, .btn-ult').forEach(b => { if(b.id !== 'btnEMP') b.disabled = data.disableAll; });
+                if(data.hpActive !== undefined) document.getElementById('btnHoneypot').disabled = data.hpActive;
+                if(data.quantumActive !== undefined) document.getElementById('btnQuantum').disabled = data.quantumActive;
+                if(data.empActive !== undefined) document.getElementById('btnEMP').disabled = data.empActive;
+                if(data.vigourDisabled !== undefined) document.getElementById('btnVigour').disabled = (data.vigourDisabled || codeState.active);
+            } 
+            
+            // VAULT SYNC FROM VISUALIZER
+            else if (data.cmd === 'syncVault') {
+                const telRemaining = document.getElementById('dashboard-vault-data');
+                const telStatus = document.getElementById('dashboard-vault-status');
+                
+                if (telRemaining && telStatus) {
+                    if (data.status.includes('LOCKED')) {
+                        telRemaining.innerText = "ENCRYPTED";
+                        telRemaining.style.color = 'var(--danger)';
+                        telRemaining.style.textShadow = '0 0 10px var(--danger)';
+                    } else {
+                        telRemaining.innerText = Math.floor(data.remaining) + " TB";
+                    }
+
+                    telStatus.innerText = "[ " + data.status + " ]";
+
+                    if (data.status === 'SECURE') {
+                        telRemaining.style.color = 'var(--primary)';
+                        telRemaining.style.textShadow = '0 0 10px var(--primary)';
+                        telStatus.style.color = 'var(--primary)';
+                    } else if (data.status.includes('EXFILTRATION')) {
+                        telRemaining.style.color = 'var(--warning)';
+                        telRemaining.style.textShadow = '0 0 10px var(--warning)';
+                        telStatus.style.color = 'var(--warning)';
+                    } else if (data.status.includes('LOCKED')) {
+                        telStatus.style.color = 'var(--danger)';
+                    }
+                }
+            }
+        });
+
+        // Codebreaker Logic
+        const codeState = { active: false, targetSequence: [], currentIndex: 0, cells: [], timeLeft: 15.0, timerInterval: null, scrambleInterval: null };
+        function generateHex() { return '0x' + Math.floor(Math.random()*256).toString(16).toUpperCase().padStart(2, '0'); }
+        function openCodebreaker() {
+            if(currentMode === 'NORMAL') { localLog("V.I.G.O.U.R requires active threat dataset.", "warn"); return; }
+            if(codeState.active) return;
+            codeState.active = true; document.getElementById('codebreaker').style.display = 'block'; localLog("Initializing V.I.G.O.U.R. Passage Code...", "vigour");
+            codeState.targetSequence = [generateHex(), generateHex(), generateHex(), generateHex()]; codeState.currentIndex = 0;
+            document.getElementById('cbTargetDisplay').innerHTML = codeState.targetSequence.map((code, i) => `<span id="target-${i}">${code}</span>`).join('');
+            const grid = document.getElementById('cbGrid'); grid.innerHTML = ''; codeState.cells = [];
+            let targetPositions = []; while(targetPositions.length < 4) { let r = Math.floor(Math.random() * 25); if(targetPositions.indexOf(r) === -1) targetPositions.push(r); }
+            for(let i=0; i<25; i++) {
+                let cell = document.createElement('div'); cell.className = 'hex-cell'; let isTargetIndex = targetPositions.indexOf(i);
+                if(isTargetIndex !== -1) { cell.innerText = codeState.targetSequence[isTargetIndex]; cell.dataset.isTarget = "true"; cell.dataset.seqIndex = isTargetIndex; } else { cell.innerText = generateHex(); cell.dataset.isTarget = "false"; }
+                cell.onclick = () => handleHexClick(cell); grid.appendChild(cell); codeState.cells.push(cell);
+            }
+            codeState.timeLeft = 15.0; document.getElementById('cbTimer').innerText = codeState.timeLeft.toFixed(2) + "s";
+            codeState.timerInterval = setInterval(() => { codeState.timeLeft -= 0.05; if(codeState.timeLeft <= 0) { document.getElementById('cbTimer').innerText = "0.00s"; closeCodebreaker(false); } else { document.getElementById('cbTimer').innerText = codeState.timeLeft.toFixed(2) + "s"; } }, 50);
+            codeState.scrambleInterval = setInterval(() => { codeState.cells.forEach(cell => { if(cell.dataset.isTarget === "false" && !cell.classList.contains('error')) { if(Math.random() > 0.5) cell.innerText = generateHex(); } }); }, 600);
+        }
+        function handleHexClick(cell) {
+            if(!codeState.active) return;
+            if(cell.dataset.isTarget === "true" && parseInt(cell.dataset.seqIndex) === codeState.currentIndex) {
+                cell.classList.add('active'); document.getElementById(`target-${codeState.currentIndex}`).classList.add('found'); codeState.currentIndex++;
+                if(codeState.currentIndex >= codeState.targetSequence.length) closeCodebreaker(true);
+            } else if (!cell.classList.contains('active')) { cell.classList.add('error'); codeState.timeLeft -= 2.0; setTimeout(() => cell.classList.remove('error'), 500); }
+        }
+        function closeCodebreaker(success = false) {
+            codeState.active = false; clearInterval(codeState.timerInterval); clearInterval(codeState.scrambleInterval); document.getElementById('codebreaker').style.display = 'none';
+            if(success) socket.emit('omni_sync', {cmd: 'vigourSuccess'}); else localLog("V.I.G.O.U.R DECRYPTION FAILED. SEQUENCE LOST.", "warn");
+        }
+        window.closeCodebreaker = closeCodebreaker; document.getElementById('btnVigour').addEventListener('click', openCodebreaker);
+
+        window.addEventListener('keydown', (event) => {
+            if (codeState && codeState.active && event.key !== 'Escape') return;
+            switch(event.key.toLowerCase()) {
+                case '1': document.getElementById('btnInterceptor').click(); break; case '2': document.getElementById('btnDeepScan').click(); break;
+                case '3': document.getElementById('btnHoneypot').click(); break; case '4': document.getElementById('btnSignatures').click(); break;
+                case '5': document.getElementById('btnBlackhole').click(); break; case '6': document.getElementById('btnQuantum').click(); break;
+                case '7': document.getElementById('btnEMP').click(); break; case '8': document.getElementById('btnVigour').click(); break;
+                case 'u': document.getElementById('ui-toggle-btn').click(); break;
+                case 'escape': if (codeState && codeState.active) closeCodebreaker(false); break;
+            }
+        });
+    </script>
+</body>
+</html>
