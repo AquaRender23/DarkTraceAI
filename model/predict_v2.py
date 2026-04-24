@@ -2,109 +2,118 @@ import pandas as pd
 import joblib
 import os
 from xgboost import XGBClassifier
+from collections import defaultdict
 
-# =========================
-# BASE PATH (IMPORTANT FIX)
-# =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# =========================
-# 1. LOAD MODEL
-# =========================
+# Load model
 print("📦 Loading model and artifacts...")
-
-model_path = os.path.join(BASE_DIR, "models", "xgboost_model_v2.json")
-le_path = os.path.join(BASE_DIR, "models", "label_encoder_v2.pkl")
-features_path = os.path.join(BASE_DIR, "models", "features_v2.pkl")
-
-if not os.path.exists(model_path):
-    print("❌ Model not found! Run training first.")
-    exit()
-
 model = XGBClassifier()
-model.load_model(model_path)
-
-le = joblib.load(le_path)
-training_features = joblib.load(features_path)
-
+model.load_model(os.path.join(BASE_DIR, "models", "xgboost_model_v2.json"))
+le = joblib.load(os.path.join(BASE_DIR, "models", "label_encoder_v2.pkl"))
+training_features = joblib.load(os.path.join(BASE_DIR, "models", "features_v2.pkl"))
 print("✅ Model loaded!")
 
-# =========================
-# 2. LOAD DATA
-# =========================
+# Load data
 print("\n📂 Loading dataset...")
-
 data_folder = os.path.join(BASE_DIR, "data")
 files = [os.path.join(data_folder, f) for f in os.listdir(data_folder) if f.endswith(".csv")]
-
 df_list = []
-
 for file in files:
     print(f"➡️ Reading: {os.path.basename(file)}")
     temp = pd.read_csv(file)
     temp.columns = temp.columns.str.strip()
     df_list.append(temp)
-
 df = pd.concat(df_list, ignore_index=True)
+print(f"✅ Data loaded! Shape: {df.shape}")
 
-print("✅ Data loaded!")
-print("📊 Dataset shape:", df.shape)
-
-# =========================
-# 3. CLEAN + FIX TYPES (IMPORTANT FIX)
-# =========================
+# Clean
 print("\n🧹 Cleaning data...")
-
 df = df.replace([float("inf"), float("-inf")], pd.NA)
-df = df.dropna()
-
-# Convert ALL columns to numeric (fix for object dtype error)
-df = df.apply(pd.to_numeric, errors='coerce')
-df = df.dropna()
-
+label_col = df["Label"].copy()
+feature_cols = [col for col in df.columns if col != "Label"]
+df[feature_cols] = df[feature_cols].apply(pd.to_numeric, errors='coerce')
+df["Label"] = label_col
+df = df.dropna(subset=feature_cols)
 print("✅ Data cleaned!")
+print(f"📊 Unique labels found: {sorted(df['Label'].unique())}")
 
-# =========================
-# 4. SELECT ATTACK SAMPLE
-# =========================
-print("\n🎯 Selecting attack sample...")
+# ============================
+# TEST 5 SAMPLES PER ATTACK TYPE
+# ============================
+print("\n" + "="*65)
+print("         MODEL ACCURACY TEST — 5 SAMPLES PER ATTACK TYPE")
+print("="*65)
 
-attack_df = df[df["Label"] != "BENIGN"]
+SAMPLES_PER_CLASS = 5
+attack_types = df["Label"].unique()
+results = defaultdict(lambda: {"correct": 0, "total": 0, "wrong": []})
 
-if attack_df.empty:
-    print("⚠️ No attack rows found, using random row.")
-    row = df.sample(1)
+for attack in sorted(attack_types):
+    subset = df[df["Label"] == attack]
+    samples = subset.sample(min(SAMPLES_PER_CLASS, len(subset)), random_state=42)
+
+    for _, row in samples.iterrows():
+        try:
+            actual = row["Label"]
+            sample_aligned = row[training_features].to_frame().T
+            sample_aligned = sample_aligned.apply(pd.to_numeric, errors='coerce')
+            pred_idx = model.predict(sample_aligned)
+            detected = le.inverse_transform(pred_idx)[0]
+
+            results[actual]["total"] += 1
+            if actual == detected:
+                results[actual]["correct"] += 1
+            else:
+                results[actual]["wrong"].append(detected)
+
+        except Exception as e:
+            print(f"❌ Error on attack '{attack}': {e}")
+            break
+
+# ============================
+# PRINT RESULTS
+# ============================
+if not results:
+    print("❌ No results collected — all predictions failed. Check errors above.")
 else:
-    row = attack_df.sample(1)
+    print(f"\n{'Attack Type':<40} {'Correct':<10} {'Total':<10} {'Accuracy':<10} Status")
+    print("-"*80)
 
-actual_label = row["Label"].values[0]
+    overall_correct = 0
+    overall_total = 0
 
-# =========================
-# 5. ALIGN FEATURES
-# =========================
-print("🔧 Aligning features...")
+    for attack in sorted(results):
+        c = results[attack]["correct"]
+        t = results[attack]["total"]
+        acc = (c / t) * 100
+        overall_correct += c
+        overall_total += t
 
-sample_aligned = row[training_features]
+        if acc == 100:
+            status = "✅ GREAT"
+        elif acc >= 60:
+            status = "⚠️  OK"
+        else:
+            status = "❌ POOR"
 
-# =========================
-# 6. PREDICT
-# =========================
-print("\n🤖 Running prediction...")
+        wrong_info = ""
+        if results[attack]["wrong"]:
+            wrong_info = f"  (misclassified as: {', '.join(set(results[attack]['wrong']))})"
 
-prediction_idx = model.predict(sample_aligned)
-detected_label = le.inverse_transform(prediction_idx)[0]
+        print(f"{attack:<40} {c:<10} {t:<10} {acc:<9.0f}% {status}{wrong_info}")
 
-# =========================
-# 7. OUTPUT
-# =========================
-print("\n" + "═"*40)
-print(f"🎯 ACTUAL ATTACK:     {actual_label}")
-print(f"🚨 DETECTED ATTACK:   {detected_label}")
-print("═"*40)
+    print("-"*80)
+    overall_acc = (overall_correct / overall_total) * 100
 
-if actual_label == detected_label:
-    print("✅ MATCH — Correct detection")
-else:
-    print("❌ MISMATCH — Incorrect detection")
+    if overall_acc >= 90:
+        verdict = "🏆 EXCELLENT — Model is production ready!"
+    elif overall_acc >= 75:
+        verdict = "✅ GOOD — Model is working well"
+    elif overall_acc >= 50:
+        verdict = "⚠️  FAIR — Model needs improvement"
+    else:
+        verdict = "❌ POOR — Model needs retraining"
 
-print("═"*40 + "\n")
+    print(f"{'OVERALL':<40} {overall_correct:<10} {overall_total:<10} {overall_acc:<9.1f}% {verdict}")
+    print("="*80 + "\n")

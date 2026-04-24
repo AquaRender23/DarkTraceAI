@@ -181,7 +181,9 @@
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-        const socket = io('http://127.0.0.1:5000');
+
+        const socket = io('http://127.0.0.1:5001');
+
 
         // --- ALL 14 LAYERS CONFIGURED ---
         const layerData = [
@@ -208,6 +210,9 @@
 
         const state = {
             mode: 'NORMAL',
+            intensity: 1.0, // Added intensity to match encryption calculations
+            encryption: 'AES-256', // Added encryption state
+            encryptionIntegrity: 100, // Added encryption integrity
             vault: { remaining: 10000, status: 'SECURE' }, 
             maxHealth: {}, health: {}, 
             purged: 0, soarActive: false, startTime: Date.now(), autoPilot: false, nextModeShift: 0,
@@ -399,7 +404,9 @@
                     case 'btnBlackhole': for(let i=0; i<traffic.count*3; i+=3) { traffic.positions[i] *= 3; traffic.positions[i+1] *= 3; traffic.positions[i+2] *= 3; } traffic.system.geometry.attributes.position.needsUpdate = true; break;
                     case 'btnQuantum': if(!state.def.quantumActive) { state.def.quantumActive = true; shockwaveGroup.visible = true; state.def.qScale = 1; Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); setTimeout(() => { state.def.quantumActive = false; }, 4000); } break;
                     case 'btnEMP': if(!state.def.empActive) { state.def.empActive = true; empSphere.visible = true; state.def.empScale = 0.1; [traffic, brute, apt, exfil, ransomParticles].forEach(sys => { for(let i=0; i<sys.count*3; i+=3) { spawnOuter(sys.positions, i, 220, 320); } sys.system.geometry.attributes.position.needsUpdate = true; }); if(state.mode === 'RANSOM') { setMode('NORMAL'); if(state.autoPilot) state.nextModeShift = performance.now() + 5000;} } break;
-                    case 'btnRepair': Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.serverBreached = false; state.startTime = Date.now(); state.vault.remaining = 10000; state.vault.status = 'SECURE'; if(state.ransomLocked) setMode('NORMAL'); break;
+
+                    case 'btnRepair': Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.serverBreached = false; state.encryptionIntegrity = 100; state.startTime = Date.now(); state.vault.remaining = 10000; state.vault.status = 'SECURE'; if(state.ransomLocked) setMode('NORMAL'); break;
+
                 }
             } else if (data.cmd === 'vigourSuccess') {
                 Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.purged += 5; 
@@ -639,17 +646,21 @@
             // ==========================================
             if (state.mode !== 'NORMAL' && !state.serverBreached) {
                 
-                // 1. DYNAMIC QUANTUM ARMOR (Activates if shield health drops below 40%)
-                if (state.health[activeLayerName] < 80 && !state.def.quantumActive && (now - state.lastQuantumTime > 15000)) {
+
+                // 1. DYNAMIC QUANTUM ARMOR (NERFED: Triggers < 20% HP, 30s Cooldown, 2.5s Duration)
+                if (state.health[activeLayerName] < 40 && !state.def.quantumActive && (now - state.lastQuantumTime > 30000)) {
                     addLog(`SOAR: ${activeLayerName.toUpperCase()} critical. Deploying Quantum Armor.`, "warn");
                     state.def.quantumActive = true; 
                     shockwaveGroup.visible = true; 
                     state.def.qScale = 1;
                     
-                    // Boost the active layer slightly so it doesn't instantly die
-                    state.health[activeLayerName] = Math.min(state.maxHealth[activeLayerName], state.health[activeLayerName] + 50);
+
+                    // Minor emergency boost (+25 instead of +50) so it doesn't instantly die after armor drops
+                    state.health[activeLayerName] = Math.min(state.maxHealth[activeLayerName], state.health[activeLayerName] + 25);
                     
-                    setTimeout(() => { state.def.quantumActive = false; }, 4000);
+                    // Shorter duration (2.5 seconds instead of 4 seconds)
+                    setTimeout(() => { state.def.quantumActive = false; }, 2500);
+
                     state.lastQuantumTime = now;
                 }
 
@@ -662,7 +673,9 @@
                 }
 
                 if (isFailing && !state.def.empActive && (now - state.lastEmpTime > 10000)) {
-    state.lastEmpTime = now;
+
+                    state.lastEmpTime = now;
+
 
                     addLog("CRITICAL: Structural failure imminent. SOAR activating EMP.", "alert");
                     state.def.empActive = true; 
@@ -788,32 +801,7 @@
             let isImmune = state.def.quantumActive; 
             let dmgMult = 1.0;
 
-            if (threatState.active) {
-                const elapsed = ((now - threatState.startTime) / 1000); 
-                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-                const secs = Math.floor(elapsed % 60).toString().padStart(2, '0');
-                const ms = Math.floor((elapsed * 100) % 100).toString().padStart(2, '0');
-                document.getElementById('tp-time').innerText = `T+ ${mins}:${secs}:${ms}`;
-                
-                const activeFullName = allPotentialLayers.find(l => l.id === activeLayerName)?.name || 'CORE DATA VAULT';
-                document.getElementById('tp-target').innerText = activeFullName;
-                
-                let unit = " MB";
-                if (state.mode === 'DDOS') {
-                    threatState.dataExposed += (threatState.rate * dt);
-                    unit = " GB";
-                } else if (state.mode === 'RANSOM') {
-                    threatState.dataExposed += (threatState.rate * dt);
-                    unit = " FILES";
-                } else {
-                    let trickRate = (state.serverBreached) ? threatState.rate * 0.5 : 0.5;
-                    threatState.dataExposed += (trickRate * dt);
-                }
-                
-                const displayVal = (state.mode === 'RANSOM') ? Math.floor(threatState.dataExposed) : threatState.dataExposed.toFixed(2);
-                document.getElementById('tp-data').innerText = displayVal + unit;
-                document.getElementById('tp-bar').style.width = ((Math.sin(now * 0.01) * 0.5 + 0.5) * 100) + "%";
-            }
+
 
             if (state.def.interceptor) {
                 if (state.def.interceptorStatus === 'ACTIVE') {
@@ -969,6 +957,8 @@
                 serverMesh.material.emissive.setHex(0x0033ff); 
             }
 
+
+
             const vVal = document.getElementById('vault-val'); 
             const vStat = document.getElementById('vault-status');
             
@@ -988,9 +978,63 @@
                 }
             }
 
-            if (now - state.lastLogTime > 100) { 
-                socket.emit('omni_sync', { cmd: 'syncVault', remaining: state.vault.remaining, status: state.vault.status }); 
-                state.lastLogTime = now; 
+
+            if (now - state.lastLogTime > 100) {
+                // Vault sync (received by telemetry syncVault handler)
+                socket.emit('omni_sync', { cmd: 'syncVault', remaining: state.vault.remaining, status: state.vault.status });
+
+                // Push current mode to telemetry
+                socket.emit('omni_sync', { type: 'syncMode', mode: state.mode, autoPilot: state.autoPilot });
+
+                // Build layer health payload for telemetry hudUpdate
+                const layerHealthPayload = allPotentialLayers.map(l => {
+                    const hp = state.health[l.id] || 0;
+                    const max = state.maxHealth[l.id] || 200;
+                    const pct = Math.max(0, (hp / max) * 100);
+                    const isOffline = hp <= 0;
+                    return {
+                        layer: l.id,
+                        pctText: isOffline ? "OFFLINE" : Math.floor(pct),
+                        pctWidth: isOffline ? 0 : pct,
+                        barColor: pct < 40 ? '#ff1744' : '#00e5ff',
+                        barShadow: pct < 40 ? '0 0 8px #ff1744' : '0 0 8px #00e5ff',
+                        txtClass: pct < 40 ? 'hud-val status-crit' : 'hud-val status-ok'
+                    };
+                });
+
+                const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+                const mm = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const ss = (elapsed % 60).toString().padStart(2, '0');
+                const isAttacking = state.mode !== 'NORMAL';
+                const totalHp = allPotentialLayers.reduce((s, l) => s + (state.health[l.id] || 0), 0);
+                const maxTotalHp = allPotentialLayers.reduce((s, l) => s + (state.maxHealth[l.id] || 200), 0);
+                const loadPct = Math.round(Math.max(12, 100 - (totalHp / maxTotalHp) * 100));
+                const sysCritical = state.serverBreached || allPotentialLayers.some(l => (state.health[l.id] || 0) < 40);
+
+                socket.emit('omni_sync', {
+                    type: 'hudUpdate',
+                    mode: state.mode,
+                    loadTxt: loadPct + '%',
+                    loadClass: sysCritical ? 'hud-val status-crit' : 'hud-val status-ok',
+                    time: mm + ':' + ss,
+                    purged: state.purged,
+                    threatTxt: isAttacking ? state.mode + ' ATTACK' : 'NONE',
+                    threatColor: isAttacking ? '#ff1744' : '#00e5ff',
+                    serverTxt: state.serverBreached ? 'BREACHED' : (isAttacking ? 'UNDER ATTACK' : 'SECURE'),
+                    serverClass: state.serverBreached ? 'hud-val status-crit' : (isAttacking ? 'hud-val status-warn' : 'hud-val status-ok'),
+                    soarText: state.soarActive ? 'ACTIVE' : 'OFFLINE',
+                    soarColor: state.soarActive ? '#00e5ff' : '#78909c',
+                    socText: state.serverBreached ? 'TIER 3 - BREACH' : (isAttacking ? 'TIER 2 - ALERT' : 'TIER 1 - SECURE'),
+                    socClass: state.serverBreached ? 'hud-val status-crit' : (isAttacking ? 'hud-val status-warn' : 'hud-val status-ok'),
+                    socAnalysts: state.serverBreached ? 6 : (isAttacking ? 4 : 3),
+                    glitch: state.serverBreached,
+                    shake: triggerShakeFlag,
+                    layers: layerHealthPayload
+                });
+
+                triggerShakeFlag = false;
+                state.lastLogTime = now;
+
             }
 
             renderer.render(scene, camera);

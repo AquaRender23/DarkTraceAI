@@ -1,14 +1,17 @@
-from flask import Flask
-from flask_socketio import SocketIO
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from xgboost import XGBClassifier
+import joblib
+import os
+import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
-# This allows your local browser to connect to the server safely
-socketio = SocketIO(app, cors_allowed_origins="*")
+CORS(app)
 
-# --- CENTRAL SECURITY MODULE REGISTRY ---
-# You can add or remove items from this list to change the UI rings dynamically!
-SECURITY_MODULES = [
-    # --- CENTRAL SECURITY MODULE REGISTRY (14 LAYERS) ---
+# =========================
+# SECURITY MODULES (for UI / simulation)
+# =========================
 SECURITY_MODULES = [
     {"id": "intel", "name": "Threat Intel"},
     {"id": "cloud", "name": "Cloud Scrub"},
@@ -25,29 +28,72 @@ SECURITY_MODULES = [
     {"id": "ztna", "name": "ZTNA Access"},
     {"id": "core", "name": "Core Auth"}
 ]
-]
 
-@socketio.on('connect')
-def handle_connect():
-    print("[SERVER] A UI Client connected successfully.")
-    # Immediately sync the security modules to the client upon connection
-    socketio.emit('init_ui', {'modules': SECURITY_MODULES})
+# =========================
+# LOAD MODEL
+# =========================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# --- THE UNIVERSAL ROUTER ---
-# This routes button clicks, mode changes, and telemetry data between UI components
-@socketio.on('omni_sync')
-def handle_omni_sync(data):
-    # Broadcast to all clients (excluding the sender)
-    socketio.emit('omni_sync', data, include_self=False)
 
-# =====================================================================
-# ML INTEGRATION POINT:
-# Your partner loads their model here. When their model detects 
-# a threat, they trigger the UI update using:
-#
-# socketio.emit('omni_sync', {'cmd': 'setMode', 'val': 'BRUTE'})
-# =====================================================================
+model_path = os.path.join(BASE_DIR, "../model/models/xgboost_model_v2.json")
+le_path = os.path.join(BASE_DIR, "../model/models/label_encoder_v2.pkl")
+features_path = os.path.join(BASE_DIR, "../model/models/features_v2.pkl")
 
-if __name__ == '__main__':
-    print("Starting Omni-Stack Core Server on port 5000...")
-    socketio.run(app, host='127.0.0.1', port=5000)
+model = XGBClassifier()
+model.load_model(model_path)
+
+label_encoder = joblib.load(le_path)
+training_features = joblib.load(features_path)
+
+print("✅ Model loaded")
+
+# =========================
+# HEALTH CHECK (important for demo)
+# =========================
+@app.route('/')
+def home():
+    return {"status": "Backend running"}
+
+# =========================
+# ANALYZE API
+# =========================
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    try:
+        data = request.json
+        features = data.get("features")
+
+        # ✅ VALIDATION
+        if not features:
+            return jsonify({"error": "No features provided"}), 400
+
+        if len(features) != len(training_features):
+            return jsonify({
+                "error": f"Expected {len(training_features)} features"
+            }), 400
+
+        # Convert to DataFrame
+        sample = pd.DataFrame([features], columns=training_features)
+
+        # Prediction
+        pred_idx = model.predict(sample)
+        prediction = label_encoder.inverse_transform(pred_idx)[0]
+
+        # Confidence
+        proba = model.predict_proba(sample)
+        confidence = float(np.max(proba))
+
+        print(f"🚨 {prediction} ({round(confidence*100,2)}%)")
+
+        return jsonify({
+            "prediction": prediction,
+            "confidence": round(confidence * 100, 2)
+        })
+
+    except Exception as e:
+        print("❌ ERROR:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(port=5000)
