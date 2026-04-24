@@ -8,18 +8,23 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # --- CENTRAL SECURITY MODULE REGISTRY ---
 # You can add or remove items from this list to change the UI rings dynamically!
 SECURITY_MODULES = [
+    # --- CENTRAL SECURITY MODULE REGISTRY (14 LAYERS) ---
+SECURITY_MODULES = [
+    {"id": "intel", "name": "Threat Intel"},
     {"id": "cloud", "name": "Cloud Scrub"},
+    {"id": "cspm", "name": "CSPM Monitor"},
     {"id": "waf", "name": "Web App FW"},
     {"id": "edge", "name": "Edge NGFW"},
     {"id": "nta", "name": "Network NTA"},
     {"id": "ips", "name": "IPS Engine"},
+    {"id": "soar", "name": "SOAR Matrix"},
     {"id": "sandbox", "name": "AV Sandbox"},
+    {"id": "xdr", "name": "XDR Engine"},
     {"id": "dlp", "name": "DLP Gateway"},
+    {"id": "deception", "name": "Decept Grid"},
     {"id": "ztna", "name": "ZTNA Access"},
-    {"id": "core", "name": "Core Auth"},
-    # Easily extend your system by adding new modules here:
-    {"id": "iot", "name": "IoT Filter"},
-    {"id": "behavior", "name": "UEBA Analytics"}
+    {"id": "core", "name": "Core Auth"}
+]
 ]
 
 @socketio.on('connect')
