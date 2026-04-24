@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cyber Shield – Threats</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='threat.css') }}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<!-- PARTICLE CANVAS BACKGROUND -->
+<canvas id="particles"></canvas>
+
+<!-- ═══════════════════ NAVBAR ═══════════════════ -->
+<div class="nav-wrapper">
+  <nav class="navbar">
+  <div class="nav-brand">
+    <div class="brand-icon">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">DarkTraceAI</span>
+      <span class="brand-sub">AI POWERED SECURITY</span>
+      <div class="nav-links">
+    <a href="#" class="nav-link"></a>
+    <a href="#" class="nav-link"></a>    
+    <a href="#" class="nav-link"></a>        
+    <a href="#" class="nav-link">DASHBOARD</a>
+    <a href="#" class="nav-link">ML MODEL REPORT</a>
+    <a href="#" class="nav-link">HISTORY</a>
+    <a href="#" class="nav-link">FIREWALLS</a>
+    <a href="#" class="nav-link active">THREATS</a>
+    <a href="#" class="nav-link">ABOUT</a>
+    <a href="#" class="nav-link">SETTINGS</a>
+    <a href="#" class="nav-link">REPORT</a>
+    
+  </div>
+    </div>
+  </div>
+  </nav>
+</div>
+
+  
+
+  <div class="nav-actions">
+    
+      <!-- <i class="fa-solid fa-bell"></i>
+      <span class="bell-badge">4</span> -->
+    <!-- </button>
+    <div class="admin-profile">
+      <div class="admin-avatar">
+        <i class="fa-solid fa-user-tie"></i>
+      </div>
+      <div class="admin-info">
+        
+        
+      </div> -->
+      <!-- <i class="fa-solid fa-chevron-down"></i>
+    </div>
+  </div>
+</nav> -->
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main class="main-content">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1 class="page-title">THREATS</h1>
+    <p class="page-subtitle">Monitor, analyze and respond to cyber threats in real-time.</p>
+  </div>
+
+  <!-- ── TOP ROW: STATS + DISTRIBUTION ── -->
+  <div class="top-row">
+
+    <!-- STAT CARDS -->
+    <div class="stat-cards">
+
+      <div class="stat-card total-threats">
+        <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">TOTAL THREATS</span>
+          <span class="stat-value" data-target="1248">0</span>
+          <span class="stat-delta up"><i class="fa-solid fa-arrow-up"></i> 24.5% from yesterday</span>
+        </div>
+      </div>
+
+      <div class="stat-card active-threats">
+        <div class="stat-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">ACTIVE THREATS</span>
+          <span class="stat-value" data-target="24">0</span>
+          <span class="stat-delta up"><i class="fa-solid fa-arrow-up"></i> 14.2% from yesterday</span>
+        </div>
+      </div>
+
+      <div class="stat-card resolved-threats">
+        <div class="stat-icon resolved-icon"><i class="fa-solid fa-shield"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">RESOLVED THREATS</span>
+          <span class="stat-value" data-target="1124">0</span>
+          <span class="stat-delta up"><i class="fa-solid fa-arrow-up"></i> 32.6% from yesterday</span>
+        </div>
+      </div>
+
+      <div class="stat-card critical-threats">
+        <div class="stat-icon critical-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">CRITICAL THREATS</span>
+          <span class="stat-value" data-target="8">0</span>
+          <span class="stat-delta up"><i class="fa-solid fa-arrow-up"></i> 2.4% from yesterday</span>
+        </div>
+      </div>
+
+    </div>
+
+   
+
+  </div><!-- /top-row -->
+
+  <!-- ── MIDDLE ROW: TABLE + SIDE PANELS ── -->
+  <div class="middle-row">
+
+    <!-- THREAT DETECTION LOGS TABLE -->
+    <div class="card table-card">
+      <div class="table-toolbar">
+        <span class="card-title">THREAT DETECTION LOGS</span>
+        <div class="toolbar-controls">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search threats..." id="searchInput"/>
+          </div>
+          <select class="filter-select" id="typeFilter">
+            <option>All Types</option>
+            <option>DDoS</option>
+            <option>Malware</option>
+            <option>Phishing</option>
+            <option>Brute Force</option>
+            <option>Port Scan</option>
+          </select>
+          <select class="filter-select" id="severityFilter">
+            <option>All Severity</option>
+            <option>Critical</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+          <select class="filter-select">
+            <option>Last 7 Days</option>
+            <option>Last 30 Days</option>
+            <option>Last 90 Days</option>
+          </select>
+          <button class="export-btn"><i class="fa-solid fa-file-export"></i> Export</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="threat-table">
+          <thead>
+            <tr>
+              <th>THREAT NAME</th>
+              <th>TYPE</th>
+              <th>SEVERITY</th>
+              <th>SOURCE IP</th>
+              <th>TARGET IP</th>
+              <th>DETECTED AT</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="threatTableBody">
+            <tr class="table-row" data-type="DDoS" data-severity="Critical">
+              <td><span class="threat-name ddos-name"><i class="fa-solid fa-bolt"></i> DDoS Attack</span></td>
+              <td><span class="type-badge ddos-type">DDoS</span></td>
+              <td><span class="sev critical">Critical</span></td>
+              <td class="mono">192.168.1.105</td>
+              <td class="mono">10.0.0.5</td>
+              <td class="mono">18 May 2025, 10:30:45 AM</td>
+              <td><span class="status active">● Active</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Malware" data-severity="High">
+              <td><span class="threat-name malware-name"><i class="fa-solid fa-bug"></i> Malware Activity</span></td>
+              <td><span class="type-badge malware-type">Malware</span></td>
+              <td><span class="sev high">High</span></td>
+              <td class="mono">192.168.1.23</td>
+              <td class="mono">10.0.0.8</td>
+              <td class="mono">18 May 2025, 10:29:12 AM</td>
+              <td><span class="status active">● Active</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Phishing" data-severity="High">
+              <td><span class="threat-name phishing-name"><i class="fa-solid fa-fish"></i> Phishing Attempt</span></td>
+              <td><span class="type-badge phishing-type">Phishing</span></td>
+              <td><span class="sev high">High</span></td>
+              <td class="mono">192.168.1.45</td>
+              <td class="mono">10.0.0.3</td>
+              <td class="mono">18 May 2025, 10:28:01 AM</td>
+              <td><span class="status blocked">● Blocked</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Brute Force" data-severity="Medium">
+              <td><span class="threat-name brute-name"><i class="fa-solid fa-key"></i> Suspicious Login</span></td>
+              <td><span class="type-badge brute-type">Brute Force</span></td>
+              <td><span class="sev medium">Medium</span></td>
+              <td class="mono">192.168.1.66</td>
+              <td class="mono">10.0.0.10</td>
+              <td class="mono">18 May 2025, 10:27:33 AM</td>
+              <td><span class="status investigating">● Investigating</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Port Scan" data-severity="Medium">
+              <td><span class="threat-name portscan-name"><i class="fa-solid fa-network-wired"></i> Port Scan Detected</span></td>
+              <td><span class="type-badge portscan-type">Port Scan</span></td>
+              <td><span class="sev medium">Medium</span></td>
+              <td class="mono">192.168.1.77</td>
+              <td class="mono">10.0.0.15</td>
+              <td class="mono">18 May 2025, 10:26:11 AM</td>
+              <td><span class="status blocked">● Blocked</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="DDoS" data-severity="Critical">
+              <td><span class="threat-name ddos-name"><i class="fa-solid fa-bolt"></i> DDoS Attack</span></td>
+              <td><span class="type-badge ddos-type">DDoS</span></td>
+              <td><span class="sev critical">Critical</span></td>
+              <td class="mono">192.168.1.89</td>
+              <td class="mono">10.0.0.2</td>
+              <td class="mono">18 May 2025, 10:24:55 AM</td>
+              <td><span class="status active">● Active</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Malware" data-severity="High">
+              <td><span class="threat-name malware-name"><i class="fa-solid fa-bug"></i> Malware Activity</span></td>
+              <td><span class="type-badge malware-type">Malware</span></td>
+              <td><span class="sev high">High</span></td>
+              <td class="mono">192.168.1.95</td>
+              <td class="mono">10.0.0.12</td>
+              <td class="mono">18 May 2025, 10:23:40 AM</td>
+              <td><span class="status quarantined">● Quarantined</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Phishing" data-severity="Medium">
+              <td><span class="threat-name phishing-name"><i class="fa-solid fa-fish"></i> Phishing Attempt</span></td>
+              <td><span class="type-badge phishing-type">Phishing</span></td>
+              <td><span class="sev medium">Medium</span></td>
+              <td class="mono">192.168.1.101</td>
+              <td class="mono">10.0.0.7</td>
+              <td class="mono">18 May 2025, 10:21:34 AM</td>
+              <td><span class="status blocked">● Blocked</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Brute Force" data-severity="Low">
+              <td><span class="threat-name brute-name"><i class="fa-solid fa-key"></i> Brute Force Attempt</span></td>
+              <td><span class="type-badge brute-type">Brute Force</span></td>
+              <td><span class="sev low">Low</span></td>
+              <td class="mono">192.168.1.110</td>
+              <td class="mono">10.0.0.9</td>
+              <td class="mono">18 May 2025, 10:20:18 AM</td>
+              <td><span class="status blocked">● Blocked</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+            <tr class="table-row" data-type="Port Scan" data-severity="Low">
+              <td><span class="threat-name portscan-name"><i class="fa-solid fa-network-wired"></i> Port Scan Detected</span></td>
+              <td><span class="type-badge portscan-type">Port Scan</span></td>
+              <td><span class="sev low">Low</span></td>
+              <td class="mono">192.168.1.120</td>
+              <td class="mono">10.0.0.11</td>
+              <td class="mono">18 May 2025, 10:18:52 AM</td>
+              <td><span class="status resolved">● Resolved</span></td>
+              <td class="actions"><button class="act-btn"><i class="fa-regular fa-eye"></i></button><button class="act-btn"><i class="fa-solid fa-shield"></i></button><button class="act-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <!-- <div class="pagination">
+        <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <span class="page-ellipsis">…</span>
+        <button class="page-btn">25</button>
+        <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+      </div> -->
+    </div>
+
+    <!-- RIGHT SIDE PANELS -->
+    <div class="side-panels">
+
+      <!-- TOP TARGETED PORTS -->
+      <div class="card side-card">
+        <div class="card-header">
+          <span class="card-title">TOP TARGETED PORTS</span>
+          <a href="#" class="view-link">View All</a>
+        </div>
+        <div class="ports-table-header">
+          <span>Port</span>
+          <span>Attempts</span>
+        </div>
+        <div class="port-bars">
+          <div class="port-row">
+            <span class="port-label">80 (HTTP)</span>
+            <div class="bar-track"><div class="bar-fill http-bar" data-width="95"></div></div>
+            <span class="port-count">452</span>
+          </div>
+          <div class="port-row">
+            <span class="port-label">443 (HTTPS)</span>
+            <div class="bar-track"><div class="bar-fill https-bar" data-width="84"></div></div>
+            <span class="port-count">389</span>
+          </div>
+          <div class="port-row">
+            <span class="port-label">22 (SSH)</span>
+            <div class="bar-track"><div class="bar-fill ssh-bar" data-width="50"></div></div>
+            <span class="port-count">215</span>
+          </div>
+          <div class="port-row">
+            <span class="port-label">3389 (RDP)</span>
+            <div class="bar-track"><div class="bar-fill rdp-bar" data-width="32"></div></div>
+            <span class="port-count">142</span>
+          </div>
+          <div class="port-row">
+            <span class="port-label">21 (FTP)</span>
+            <div class="bar-track"><div class="bar-fill ftp-bar" data-width="22"></div></div>
+            <span class="port-count">98</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- THREAT SEVERITY LEVELS -->
+      <div class="card side-card">
+        <div class="card-header">
+          <span class="card-title">THREAT SEVERITY LEVELS</span>
+          <a href="#" class="view-link">View All</a>
+        </div>
+        <div class="severity-rows">
+          <div class="sev-row">
+            <span class="sev-label">Critical</span>
+            <div class="sev-bar-track"><div class="sev-bar-fill critical-sev" data-width="6"></div></div>
+            <span class="sev-count">8</span>
+          </div>
+          <div class="sev-row">
+            <span class="sev-label">High</span>
+            <div class="sev-bar-track"><div class="sev-bar-fill high-sev" data-width="12"></div></div>
+            <span class="sev-count">16</span>
+          </div>
+          <div class="sev-row">
+            <span class="sev-label">Medium</span>
+            <div class="sev-bar-track"><div class="sev-bar-fill medium-sev" data-width="37"></div></div>
+            <span class="sev-count">48</span>
+          </div>
+          <div class="sev-row">
+            <span class="sev-label">Low</span>
+            <div class="sev-bar-track"><div class="sev-bar-fill low-sev" data-width="78"></div></div>
+            <span class="sev-count">102</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- THREAT DISTRIBUTION -->
+    <div class="card distribution-card">
+      <div class="card-header">
+        <span class="card-title">THREAT DISTRIBUTION</span>
+        <a href="#" class="view-link">View Full Report</a>
+      </div>
+      <div class="distribution-body">
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 160 160">
+            <circle class="donut-bg" cx="80" cy="80" r="60"/>
+            <!-- DDoS 36% -->
+            <circle class="donut-seg ddos" cx="80" cy="80" r="60" stroke-dasharray="135.7 226.2" stroke-dashoffset="0"/>
+            <!-- Malware 22% -->
+            <circle class="donut-seg malware" cx="80" cy="80" r="60" stroke-dasharray="82.9 278.9" stroke-dashoffset="-135.7"/>
+            <!-- Phishing 18% -->
+            <circle class="donut-seg phishing" cx="80" cy="80" r="60" stroke-dasharray="67.8 294.1" stroke-dashoffset="-218.6"/>
+            <!-- Port Scan 12% -->
+            <circle class="donut-seg portscan" cx="80" cy="80" r="60" stroke-dasharray="45.2 316.8" stroke-dashoffset="-286.4"/>
+            <!-- Brute Force 7% -->
+            <circle class="donut-seg brute" cx="80" cy="80" r="60" stroke-dasharray="26.4 335.5" stroke-dashoffset="-331.6"/>
+            <!-- Other 5% -->
+            <circle class="donut-seg other" cx="80" cy="80" r="60" stroke-dasharray="18.8 343.0" stroke-dashoffset="-358.0"/>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-num">1,248</span>
+            <span class="donut-lbl">Total</span>
+          </div>
+        </div>
+        <ul class="legend">
+          <li><span class="dot ddos-dot"></span> DDoS Attack <span class="pct">36%</span></li>
+          <li><span class="dot malware-dot"></span> Malware <span class="pct">22%</span></li>
+          <li><span class="dot phishing-dot"></span> Phishing <span class="pct">18%</span></li>
+          <li><span class="dot portscan-dot"></span> Port Scan <span class="pct">12%</span></li>
+          <li><span class="dot brute-dot"></span> Brute Force <span class="pct">7%</span></li>
+          <li><span class="dot other-dot"></span> Other <span class="pct">5%</span></li>
+        </ul>
+      </div>
+    </div>
+
+    </div><!-- /side-panels -->
+
+  </div><!-- /middle-row -->
+
+  <!-- ── RECENT CRITICAL ALERTS ── -->
+  <div class="card alerts-card">
+    <div class="alerts-header">
+      <span class="alerts-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+      <span class="card-title">RECENT CRITICAL ALERTS</span>
+    </div>
+    <div class="alerts-grid">
+
+      <div class="alert-item">
+        <span class="alert-icon ddos-alert"><i class="fa-solid fa-bolt"></i></span>
+        <div class="alert-body">
+          <span class="alert-name ddos-name">DDoS Attack Detected</span>
+          <span class="alert-meta">Firewall-3 · 10:30:45 AM</span>
+        </div>
+      </div>
+
+      <div class="alert-item">
+        <span class="alert-icon malware-alert"><i class="fa-solid fa-bug"></i></span>
+        <div class="alert-body">
+          <span class="alert-name malware-name">Malware Activity Detected</span>
+          <span class="alert-meta">Firewall-2 · 10:29:12 AM</span>
+        </div>
+      </div>
+
+      <div class="alert-item">
+        <span class="alert-icon phishing-alert"><i class="fa-solid fa-shield-check"></i></span>
+        <div class="alert-body">
+          <span class="alert-name phishing-name" style="color:#00ff88">Phishing Attempt Blocked</span>
+          <span class="alert-meta">Firewall-1 · 10:28:01 AM</span>
+        </div>
+      </div>
+
+      <div class="alert-item">
+        <span class="alert-icon brute-alert"><i class="fa-solid fa-user-secret"></i></span>
+        <div class="alert-body">
+          <span class="alert-name brute-name" style="color:#00bfff">Suspicious Login Detected</span>
+          <span class="alert-meta">Firewall-4 · 10:27:33 AM</span>
+        </div>
+      </div>
+
+      <a href="#" class="view-all-alerts">View All Alerts <i class="fa-solid fa-chevron-right"></i></a>
+    </div>
+  </div>
+
+</main>
+
+<script src="{{ url_for('static', filename='threat.js') }}"></script>
+</body>
+</html>
