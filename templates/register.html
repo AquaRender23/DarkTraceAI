@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register – DarkTraceAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="card">
+
+        <!-- LOGO -->
+        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo">
+
+        <!-- BRAND -->
+        <h1 class="brand">DARKTRACEAI</h1>
+        <p class="tagline">AI POWERED SECURITY</p>
+
+        <!-- TITLE -->
+        <h2 class="title">REGISTER</h2>
+        <p class="subtitle">Create your account to get started</p>
+
+        <!-- FORM -->
+        <form>
+
+            <div class="input">
+                <input type="text" placeholder="Full Name" required>
+            </div>
+
+            <div class="input">
+                <input type="text" placeholder="Username" required>
+            </div>
+
+            <div class="input">
+                <input type="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input">
+                <input type="password" placeholder="Password" required>
+            </div>
+
+            <div class="input">
+                <input type="password" placeholder="Confirm Password" required>
+            </div>
+
+            <button class="btn">REGISTER →</button>
+
+        </form>
+
+        <div class="divider">OR</div>
+
+        <button class="google">
+            <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
+            Continue with Google
+        </button>
+
+        <p class="login-text">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login</a>
+        </p>
+
+    </div>
+</div>
+
+</body>
+</html>
