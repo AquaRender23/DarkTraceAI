@@ -1,17 +1,27 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from flask import render_template
+from flask import render_template, redirect, url_for, session
 from flask_socketio import SocketIO, emit  # <-- ADDED 'emit' HERE
 from xgboost import XGBClassifier
 import joblib
 import os
 import pandas as pd
 import numpy as np
+from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client["darktraceai_db"]
+users_collection = db["users"]
 
 app = Flask(__name__, 
             template_folder="../templates",
             static_folder="../static")
 CORS(app)
+app.secret_key = os.getenv("SECRET_KEY")
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # =========================
@@ -34,16 +44,47 @@ print("📊 Features:", feature_template)
 
 
 @app.route('/')
-def home():
-    return render_template('home.html')
+def index():
+    return render_template('landing.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = users_collection.find_one({"username": username})
+
+        if user and user['password'] == password:
+            session['user'] = username
+            return redirect('/dashboard')
+
+        return "Invalid credentials!"
+
     return render_template('login.html')
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        # check if user exists
+        if users_collection.find_one({"username": username}):
+            return "User already exists!"
+
+        users_collection.insert_one({
+            "username": username,
+            "password": password
+        })
+
+        return redirect('/login')
+
     return render_template('register.html')
+
+@app.route('/home')
+def home_page():
+    return render_template('home.html')
 
 @app.route('/report')
 def report():
