@@ -92,7 +92,7 @@
         </div>
         <div class="threat-title-block">
           <span class="threat-label">THREAT DETECTED</span>
-          <h2 class="threat-name">DoS Slowhttptest</h2>
+          <h2 class="threat-name" id="attackName">--</h2>
           <span class="threat-type-badge">Denial of Service Attack</span>
         </div>
       </div>
@@ -103,10 +103,10 @@
       <!-- Center: Confidence -->
       <div class="confidence-block">
         <span class="conf-label">CONFIDENCE SCORE</span>
-        <div class="conf-value">28.03%</div>
+        <div class="conf-value" id="confidenceVal">--</div>
         <div class="progress-bar-wrapper">
           <div class="progress-bar">
-            <div class="progress-fill" style="--fill-pct: 28.03%"></div>
+            <div class="progress-fill"></div>
           </div>
         </div>
         <span class="conf-status low">LOW CONFIDENCE</span>
@@ -117,12 +117,12 @@
         <div class="meta-row">
           <div class="meta-icon"><i class="fas fa-crosshairs"></i></div>
           <span class="meta-key">PREDICTION</span>
-          <span class="meta-val">DoS Slowhttptest</span>
+         <span class="meta-val" id="predictionVal">--</span>
         </div>
         <div class="meta-row">
           <div class="meta-icon attack"><i class="fas fa-shield-alt"></i></div>
           <span class="meta-key">IS ATTACK</span>
-          <span class="meta-val danger">True</span>
+          <span class="meta-val danger" id="attackStatusVal">--</span>
         </div>
         <div class="meta-row">
           <div class="meta-icon"><i class="fas fa-robot"></i></div>
@@ -278,6 +278,33 @@
       }, 600);
     });
   </script>
+  <script>
+const attack = localStorage.getItem("attackType");
+const confidence = localStorage.getItem("confidence");
+const isAttack = localStorage.getItem("is_attack");
+
+console.log("FINAL DATA:", attack, confidence, isAttack);
+
+// Attack
+if (attack) {
+    document.getElementById("attackName").innerText = attack;
+    document.getElementById("predictionVal").innerText = attack;
+}
+
+// Confidence
+if (confidence) {
+    const conf = parseFloat(confidence).toFixed(2);
+
+    document.getElementById("confidenceVal").innerText = conf + "%";
+
+    document.querySelector(".progress-fill").style.width = conf + "%";
+}
+
+// Status
+if (isAttack) {
+    document.getElementById("attackStatusVal").innerText = isAttack;
+}
+</script>
 
 </body>
 </html>

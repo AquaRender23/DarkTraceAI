@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Omni-Stack Visualizer: SOAR AUTOMATION</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <style>
@@ -17,133 +19,380 @@
         }
 
         @keyframes dataRain {
-            0% { background-position: 0px 0px, 0px 0px, 0px 0px; }
-            100% { background-position: 0px 1000px, 0px 800px, 0px 400px; }
+            0% {
+                background-position: 0px 0px, 0px 0px, 0px 0px;
+            }
+
+            100% {
+                background-position: 0px 1000px, 0px 800px, 0px 400px;
+            }
         }
 
-        html, body {
-            width: 100vw; height: 100vh; margin: 0; padding: 0;
-            overflow: hidden; background-color: #010308 !important;
-            cursor: crosshair; font-family: 'Rajdhani', sans-serif; 
-            color: var(--primary); user-select: none;
+        html,
+        body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #010308 !important;
+            cursor: crosshair;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--primary);
+            user-select: none;
         }
 
         body::before {
-            content: ""; position: absolute; top: 0; left: 0; 
-            width: 100vw; height: 100vh;
-            background-image: 
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image:
                 linear-gradient(180deg, rgba(0, 243, 255, 0) 0%, rgba(0, 243, 255, 0.15) 50%, rgba(0, 243, 255, 0) 100%),
                 linear-gradient(180deg, rgba(0, 100, 255, 0) 0%, rgba(0, 100, 255, 0.1) 50%, rgba(0, 100, 255, 0) 100%),
                 linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
             background-size: 3px 200px, 5px 400px, 40px 100%;
-            z-index: 0; pointer-events: none; animation: dataRain 8s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+            animation: dataRain 8s linear infinite;
         }
 
         body::after {
-            content: ""; position: absolute; top: 0; left: 0; 
-            width: 100vw; height: 100vh;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background-image: radial-gradient(rgba(0, 243, 255, 0.08) 1px, transparent 1px);
-            background-size: 20px 20px; z-index: 0; pointer-events: none;
-        }
-        
-        .scanlines { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2)); 
-            background-size: 100% 4px; pointer-events: none; z-index: 90; 
-        }
-        
-        #hud-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 100; }
-
-        .arc-title { 
-            position: absolute; top: 30px; left: 50%; transform: translateX(-50%); 
-            text-align: center; font-size: 24px; font-weight: 700; letter-spacing: 5px; 
-            text-shadow: 0 0 15px var(--cyan-glow); border-top: 2px solid var(--primary); 
-            border-radius: 50% 50% 0 0 / 100% 100% 0 0; padding: 12px 180px 0 180px; 
-            color: #d0fbff; text-transform: uppercase; white-space: nowrap; 
+            background-size: 20px 20px;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .gauges-arc { position: absolute; top: 750px; left: 50%; width: 0; height: 0; z-index: 100; }
-        
-        .gauge-wrapper { 
-            position: absolute; display: flex; flex-direction: column; align-items: center; 
-            width: 140px; top: 0; left: 0; margin-top: -65px; margin-left: -70px;
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 90;
+        }
+
+        #hud-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .arc-title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px var(--cyan-glow);
+            border-top: 2px solid var(--primary);
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            padding: 12px 180px 0 180px;
+            color: #d0fbff;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .gauges-arc {
+            position: absolute;
+            top: 750px;
+            left: 50%;
+            width: 0;
+            height: 0;
+            z-index: 100;
+        }
+
+        .gauge-wrapper {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 140px;
+            top: 0;
+            left: 0;
+            margin-top: -65px;
+            margin-left: -70px;
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, visibility 0.4s;
         }
 
-        .gauge-label { 
-            font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 12px; 
-            letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 243, 255, 0.8); 
-            height: 32px; display: flex; align-items: flex-end; justify-content: center; 
-            text-transform: uppercase; color: #e0f7fa; 
+        .gauge-label {
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            height: 32px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            text-transform: uppercase;
+            color: #e0f7fa;
         }
 
-        .svg-container { 
-            position: relative; width: 100px; height: 100px; display: flex; justify-content: center; 
-            align-items: center; border-radius: 50%; background: rgba(2, 6, 17, 0.85); 
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 10px rgba(0, 243, 255, 0.05); 
+        .svg-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: rgba(2, 6, 17, 0.85);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 10px rgba(0, 243, 255, 0.05);
         }
 
-        svg { position: absolute; width: 125%; height: 125%; transform: rotate(-90deg); overflow: visible; }
-
-        .ring-fill { 
-            fill: none; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 251.2; 
-            transition: stroke-dashoffset 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.4s, filter 0.4s; 
+        svg {
+            position: absolute;
+            width: 125%;
+            height: 125%;
+            transform: rotate(-90deg);
+            overflow: visible;
         }
-        .ring-outer { fill: none; stroke: var(--cloud); stroke-width: 2; stroke-dasharray: 2 6; opacity: 0.6; }
 
-        .percentage { 
-            position: absolute; font-family: 'Share Tech Mono', monospace; font-size: 24px; 
-            font-weight: 700; text-align: center; width: 100%; z-index: 10; transition: color 0.4s, text-shadow 0.4s; 
+        .ring-fill {
+            fill: none;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-dasharray: 251.2;
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.4s, filter 0.4s;
+        }
+
+        .ring-outer {
+            fill: none;
+            stroke: var(--cloud);
+            stroke-width: 2;
+            stroke-dasharray: 2 6;
+            opacity: 0.6;
+        }
+
+        .percentage {
+            position: absolute;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            width: 100%;
+            z-index: 10;
+            transition: color 0.4s, text-shadow 0.4s;
         }
 
         /* --- THREAT PANEL --- */
         .threat-panel {
-            position: absolute; top: 30px; right: 30px; width: 280px; 
-            background: rgba(5, 5, 12, 0.85); border: 1px solid; 
-            z-index: 150; padding: 15px; font-family: 'Share Tech Mono', monospace;
-            color: #fff; text-transform: uppercase; transition: all 0.4s ease;
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 280px;
+            background: rgba(5, 5, 12, 0.85);
+            border: 1px solid;
+            z-index: 150;
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #fff;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
         }
 
-        .panel-secure { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 10px rgba(0, 243, 255, 0.05); }
-        .panel-danger { border-color: var(--danger); animation: threatPulse 2s infinite; }
+        .panel-secure {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 10px rgba(0, 243, 255, 0.05);
+        }
+
+        .panel-danger {
+            border-color: var(--danger);
+            animation: threatPulse 2s infinite;
+        }
 
         @keyframes threatPulse {
-            0% { box-shadow: 0 0 20px rgba(255, 23, 68, 0.2), inset 0 0 15px rgba(255, 23, 68, 0.1); border-color: rgba(255, 23, 68, 0.5); }
-            50% { box-shadow: 0 0 35px rgba(255, 23, 68, 0.5), inset 0 0 25px rgba(255, 23, 68, 0.3); border-color: rgba(255, 23, 68, 1.0); }
-            100% { box-shadow: 0 0 20px rgba(255, 23, 68, 0.2), inset 0 0 15px rgba(255, 23, 68, 0.1); border-color: rgba(255, 23, 68, 0.5); }
+            0% {
+                box-shadow: 0 0 20px rgba(255, 23, 68, 0.2), inset 0 0 15px rgba(255, 23, 68, 0.1);
+                border-color: rgba(255, 23, 68, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(255, 23, 68, 0.5), inset 0 0 25px rgba(255, 23, 68, 0.3);
+                border-color: rgba(255, 23, 68, 1.0);
+            }
+
+            100% {
+                box-shadow: 0 0 20px rgba(255, 23, 68, 0.2), inset 0 0 15px rgba(255, 23, 68, 0.1);
+                border-color: rgba(255, 23, 68, 0.5);
+            }
         }
 
-        .threat-header { font-size: 16px; font-weight: bold; border-bottom: 1px solid; padding-bottom: 6px; margin-bottom: 12px; letter-spacing: 2px; text-align: center; }
-        .panel-secure .threat-header { color: var(--primary); border-bottom-color: rgba(0,243,255,0.4); text-shadow: 0 0 8px var(--primary); }
-        .panel-danger .threat-header { color: var(--danger); border-bottom-color: var(--danger); text-shadow: 0 0 8px var(--danger); }
+        .threat-header {
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 1px solid;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
 
-        .threat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
-        .threat-label { color: #8892b0; letter-spacing: 1px; }
-        .threat-value { text-align: right; font-weight: bold; transition: color 0.3s; }
-        
-        .threat-value.secure { color: var(--primary); text-shadow: 0 0 5px rgba(0, 243, 255, 0.5); }
-        .threat-value.critical { color: var(--danger); text-shadow: 0 0 8px var(--danger); }
-        .threat-value.warning { color: var(--warning); text-shadow: 0 0 8px var(--warning); }
-        
-        .threat-bar-container { width: 100%; height: 3px; background: rgba(255,255,255,0.1); margin: 12px 0; }
-        .threat-bar { height: 100%; width: 100%; transition: width 0.1s; }
+        .panel-secure .threat-header {
+            color: var(--primary);
+            border-bottom-color: rgba(0, 243, 255, 0.4);
+            text-shadow: 0 0 8px var(--primary);
+        }
 
-        .event-log { height: 120px; overflow-y: auto; font-size: 10px; color: #a0aabf; margin-top: 15px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; gap: 4px; }
-        .event-log::-webkit-scrollbar { width: 4px; }
-        .event-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
-        
-        .log-entry { padding-left: 6px; border-left: 2px solid transparent; line-height: 1.3; }
-        .log-entry.info { border-left-color: var(--primary); color: #00f3ff; }
-        .log-entry.alert { border-left-color: var(--danger); color: #ff1744; }
-        .log-entry.warn { border-left-color: var(--warning); color: #ffea00; }
+        .panel-danger .threat-header {
+            color: var(--danger);
+            border-bottom-color: var(--danger);
+            text-shadow: 0 0 8px var(--danger);
+        }
 
-        #webgl-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; }
+        .threat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
 
-        @media (max-width: 1500px) { #hud-container { transform: scale(0.85); transform-origin: top center; } }
+        .threat-label {
+            color: #8892b0;
+            letter-spacing: 1px;
+        }
+
+        .threat-value {
+            text-align: right;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .threat-value.secure {
+            color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+        }
+
+        .threat-value.critical {
+            color: var(--danger);
+            text-shadow: 0 0 8px var(--danger);
+        }
+
+        .threat-value.warning {
+            color: var(--warning);
+            text-shadow: 0 0 8px var(--warning);
+        }
+
+        .threat-bar-container {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 12px 0;
+        }
+
+        .threat-bar {
+            height: 100%;
+            width: 100%;
+            transition: width 0.1s;
+        }
+
+        .event-log {
+            height: 120px;
+            overflow-y: auto;
+            font-size: 10px;
+            color: #a0aabf;
+            margin-top: 15px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .event-log::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .event-log::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .log-entry {
+            padding-left: 6px;
+            border-left: 2px solid transparent;
+            line-height: 1.3;
+        }
+
+        .log-entry.info {
+            border-left-color: var(--primary);
+            color: #00f3ff;
+        }
+
+        .log-entry.alert {
+            border-left-color: var(--danger);
+            color: #ff1744;
+        }
+
+        .log-entry.warn {
+            border-left-color: var(--warning);
+            color: #ffea00;
+        }
+
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .report-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid #00e5ff;
+            color: #00e5ff;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 2px;
+            cursor: pointer;
+            z-index: 9999;
+            transition: 0.3s;
+        }
+
+        .report-btn:hover {
+            background: #00e5ff;
+            color: black;
+            box-shadow: 0 0 20px #00e5ff;
+        }
+
+        @media (max-width: 1500px) {
+            #hud-container {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="scanlines"></div>
+    <button onclick="goToReport()" class="report-btn">
+        📊 VIEW REPORT
+    </button>
 
     <div id="hud-container">
         <div class="arc-title">Omni Advanced System Diagnostics</div>
@@ -152,27 +401,40 @@
 
     <div id="threat-panel" class="threat-panel panel-secure">
         <div id="tp-header" class="threat-header">SYSTEM SECURE</div>
-        
-        <div class="threat-row"><span class="threat-label">VECTOR:</span><span id="tp-type" class="threat-value secure">NONE</span></div>
-        <div class="threat-row"><span class="threat-label">TARGET:</span><span id="tp-target" class="threat-value secure">N/A</span></div>
-        <div class="threat-row"><span class="threat-label">SOURCE:</span><span id="tp-ip" class="threat-value secure">0.0.0.0</span></div>
-        <div class="threat-row"><span class="threat-label">ORIGIN:</span><span id="tp-loc" class="threat-value secure">LOCAL</span></div>
-        <div class="threat-row"><span class="threat-label">PROTO/PORT:</span><span id="tp-proto" class="threat-value secure">N/A</span></div>
-        <div class="threat-row"><span class="threat-label">SEVERITY:</span><span id="tp-sev" class="threat-value secure">LOW</span></div>
-        
-        <div class="threat-bar-container"><div id="tp-bar" class="threat-bar" style="background: var(--primary); box-shadow: none;"></div></div>
-        
-        <div class="threat-row"><span class="threat-label">UPTIME:</span><span id="tp-time" class="threat-value secure">00:00:00</span></div>
-        <div class="threat-row"><span id="tp-data-label" class="threat-label">DATA EXPOSED:</span><span id="tp-data" class="threat-value secure">0.00 MB</span></div>
-        <div class="threat-row"><span class="threat-label">SYSTEM ADAPTATION:</span><span id="tp-adapt" class="threat-value secure">100%</span></div>
-        
+
+        <div class="threat-row"><span class="threat-label">VECTOR:</span><span id="tp-type"
+                class="threat-value secure">NONE</span></div>
+        <div class="threat-row"><span class="threat-label">TARGET:</span><span id="tp-target"
+                class="threat-value secure">N/A</span></div>
+        <div class="threat-row"><span class="threat-label">SOURCE:</span><span id="tp-ip"
+                class="threat-value secure">0.0.0.0</span></div>
+        <div class="threat-row"><span class="threat-label">ORIGIN:</span><span id="tp-loc"
+                class="threat-value secure">LOCAL</span></div>
+        <div class="threat-row"><span class="threat-label">PROTO/PORT:</span><span id="tp-proto"
+                class="threat-value secure">N/A</span></div>
+        <div class="threat-row"><span class="threat-label">SEVERITY:</span><span id="tp-sev"
+                class="threat-value secure">LOW</span></div>
+
+        <div class="threat-bar-container">
+            <div id="tp-bar" class="threat-bar" style="background: var(--primary); box-shadow: none;"></div>
+        </div>
+
+        <div class="threat-row"><span class="threat-label">UPTIME:</span><span id="tp-time"
+                class="threat-value secure">00:00:00</span></div>
+        <div class="threat-row"><span id="tp-data-label" class="threat-label">DATA EXPOSED:</span><span id="tp-data"
+                class="threat-value secure">0.00 MB</span></div>
+        <div class="threat-row"><span class="threat-label">SYSTEM ADAPTATION:</span><span id="tp-adapt"
+                class="threat-value secure">100%</span></div>
+
         <div id="event-log" class="event-log"></div>
     </div>
 
-    <div id="vault-hud" style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; font-family: 'Share Tech Mono', monospace; z-index: 1000; pointer-events: none;">
+    <div id="vault-hud"
+        style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; font-family: 'Share Tech Mono', monospace; z-index: 1000; pointer-events: none;">
         <div style="color: #00f3ff; font-size: 14px; letter-spacing: 4px; margin-bottom: 5px;">CORE DATA VAULT</div>
         <div id="vault-val" style="color: #fff; font-size: 32px; text-shadow: 0 0 15px #00f3ff;">10000 / 10000 TB</div>
-        <div id="vault-status" style="color: #00f3ff; font-size: 16px; letter-spacing: 2px; margin-top: 5px;">[ SECURE ]</div>
+        <div id="vault-status" style="color: #00f3ff; font-size: 16px; letter-spacing: 2px; margin-top: 5px;">[ SECURE ]
+        </div>
     </div>
 
     <div id="webgl-container"></div>
@@ -213,12 +475,12 @@
             intensity: 1.0, // Added intensity to match encryption calculations
             encryption: 'AES-256', // Added encryption state
             encryptionIntegrity: 100, // Added encryption integrity
-            vault: { remaining: 10000, status: 'SECURE' }, 
-            maxHealth: {}, health: {}, 
+            vault: { remaining: 10000, status: 'SECURE' },
+            maxHealth: {}, health: {},
             purged: 0, soarActive: false, startTime: Date.now(), autoPilot: false, nextModeShift: 0,
-            def: { 
+            def: {
                 interceptor: false, interceptorStatus: 'ACTIVE', interceptorEnergy: 100,
-                scan: false, hpActive: false, quantumActive: false, qScale: 1, empActive: false, empScale: 1 
+                scan: false, hpActive: false, quantumActive: false, qScale: 1, empActive: false, empScale: 1
             },
             ransomLocked: false, lastLogTime: 0, lastSoarTime: 0, serverBreached: false,
             lastActiveLayer: 'intel',
@@ -234,13 +496,13 @@
         function addLog(msg, type = 'info') {
             const logContainer = document.getElementById('event-log');
             const d = new Date();
-            const timeStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0') + ':' + d.getSeconds().toString().padStart(2,'0') + '.' + Math.floor(d.getMilliseconds()/100);
-            
+            const timeStr = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0') + ':' + d.getSeconds().toString().padStart(2, '0') + '.' + Math.floor(d.getMilliseconds() / 100);
+
             const entry = document.createElement('div');
             entry.className = `log-entry ${type}`;
             entry.innerHTML = `[${timeStr}] ${msg}`;
             logContainer.prepend(entry);
-            if(logContainer.children.length > 25) logContainer.removeChild(logContainer.lastChild);
+            if (logContainer.children.length > 25) logContainer.removeChild(logContainer.lastChild);
         }
 
         const threatState = { active: false, startTime: 0, dataExposed: 0, rate: 0, ip: '', loc: '', proto: '', sev: '', adaptation: 1.0 };
@@ -255,52 +517,52 @@
                 panel.className = 'threat-panel panel-secure';
                 header.innerText = 'SYSTEM SECURE';
                 threatState.active = false;
-                
+
                 document.getElementById('tp-type').innerText = 'NONE'; document.getElementById('tp-ip').innerText = '0.0.0.0';
                 document.getElementById('tp-loc').innerText = 'LOCAL'; document.getElementById('tp-proto').innerText = 'N/A';
                 document.getElementById('tp-sev').innerText = 'LOW'; document.getElementById('tp-time').innerText = '00:00:00';
                 document.getElementById('tp-data').innerText = '0.00 MB'; document.getElementById('tp-adapt').innerText = '100%';
-                
+
                 els.forEach(id => document.getElementById(id).className = 'threat-value secure');
                 bar.style.background = 'var(--primary)'; bar.style.boxShadow = 'none'; bar.style.width = '100%';
-                
+
                 addLog("System normalized. Defense matrix stable.", "info");
                 return;
             }
 
             const geoPool = ["ST. PETERSBURG, RU", "BEIJING, CN", "PYONGYANG, KP", "TEHRAN, IR", "UNKNOWN (TOR EXIT)", "SPOOFED (AWS IP)", "SHANGHAI, CN", "MOSCOW, RU", "DARKNET NODE"];
-            threatState.active = true; threatState.startTime = performance.now(); threatState.dataExposed = 0; threatState.adaptation = 1.0; 
+            threatState.active = true; threatState.startTime = performance.now(); threatState.dataExposed = 0; threatState.adaptation = 1.0;
             threatState.sev = (mode === 'APT' || mode === 'RANSOM' || mode === 'INSIDER') ? "CRITICAL" : "HIGH";
 
             if (mode === 'DDOS') {
                 threatState.ip = "BOTNET SWARM"; threatState.loc = "GLOBAL MULTI-VECTOR"; threatState.proto = "UDP / 53 (DNS)"; threatState.rate = 150 + Math.random() * 500;
                 document.getElementById('tp-data-label').innerText = "TRAFFIC VOLUME:";
             } else if (mode === 'INSIDER') {
-                threatState.ip = "10.0." + Math.floor(Math.random()*255) + "." + Math.floor(Math.random()*255) + " (LAN)"; threatState.loc = "LOCAL SUBNET - SECTOR 4"; threatState.proto = "TCP / 445 (SMB)"; threatState.rate = 15 + Math.random() * 30;
+                threatState.ip = "10.0." + Math.floor(Math.random() * 255) + "." + Math.floor(Math.random() * 255) + " (LAN)"; threatState.loc = "LOCAL SUBNET - SECTOR 4"; threatState.proto = "TCP / 445 (SMB)"; threatState.rate = 15 + Math.random() * 30;
                 document.getElementById('tp-data-label').innerText = "DATA COMPROMISED:";
             } else {
-                threatState.ip = Math.floor(Math.random()*255) + "." + Math.floor(Math.random()*255) + "." + Math.floor(Math.random()*255) + ".x"; threatState.loc = geoPool[Math.floor(Math.random() * geoPool.length)];
+                threatState.ip = Math.floor(Math.random() * 255) + "." + Math.floor(Math.random() * 255) + "." + Math.floor(Math.random() * 255) + ".x"; threatState.loc = geoPool[Math.floor(Math.random() * geoPool.length)];
                 if (mode === 'INJECT') threatState.proto = "TCP / 443 (HTTPS)"; else if (mode === 'BRUTE') threatState.proto = "TCP / 22 (SSH)"; else if (mode === 'RANSOM') threatState.proto = "TCP / 3389 (RDP)"; else threatState.proto = "CUSTOM / ENCRYPTED";
-                threatState.rate = 5 + Math.random() * 20; 
+                threatState.rate = 5 + Math.random() * 20;
                 document.getElementById('tp-data-label').innerText = (mode === 'RANSOM') ? "FILES ENCRYPTED:" : "PAYLOAD SIZE:";
             }
 
             document.getElementById('tp-type').innerText = mode + " ATTACK"; document.getElementById('tp-ip').innerText = threatState.ip;
             document.getElementById('tp-loc').innerText = threatState.loc; document.getElementById('tp-proto').innerText = threatState.proto;
             document.getElementById('tp-sev').innerText = threatState.sev;
-            
+
             panel.className = 'threat-panel panel-danger'; header.innerText = '⚠️ THREAT DETECTED ⚠️';
             bar.style.background = 'var(--danger)'; bar.style.boxShadow = '0 0 10px var(--danger)';
-            
+
             els.forEach(id => {
-                if(id !== 'tp-target') {
+                if (id !== 'tp-target') {
                     let el = document.getElementById(id);
                     el.className = (id === 'tp-sev' && threatState.sev === "CRITICAL") ? 'threat-value critical' : 'threat-value warning';
                 }
             });
             document.getElementById('tp-type').className = 'threat-value critical'; document.getElementById('tp-data').className = 'threat-value critical';
-            document.getElementById('tp-target').className = 'threat-value warning'; document.getElementById('tp-adapt').className = 'threat-value critical'; 
-            
+            document.getElementById('tp-target').className = 'threat-value warning'; document.getElementById('tp-adapt').className = 'threat-value critical';
+
             addLog(`WARNING: ${mode} vector detected from ${threatState.ip}`, 'alert');
         }
 
@@ -311,12 +573,12 @@
         allPotentialLayers.forEach(mod => {
             const wrapper = document.createElement('div');
             wrapper.className = 'gauge-wrapper';
-            wrapper.id = 'wrapper-' + mod.id; 
-            
+            wrapper.id = 'wrapper-' + mod.id;
+
             wrapper.style.opacity = '0';
             wrapper.style.visibility = 'hidden';
             wrapper.style.transform = `rotate(0deg) translateY(-580px) rotate(0deg)`;
-            
+
             wrapper.innerHTML = `
                 <div class="gauge-label">${mod.name.replace(' ', '<br>')}</div>
                 <div class="svg-container">
@@ -334,48 +596,48 @@
         function setMode(newMode) {
             const previousMode = state.mode;
             state.mode = newMode;
-            
-            traffic.system.visible = (state.mode === 'NORMAL' || state.mode === 'DDOS'); 
-            brute.system.visible = (state.mode === 'BRUTE'); 
-            apt.system.visible = (state.mode === 'APT'); 
-            exfil.system.visible = (state.mode === 'EXFIL'); 
-            ransomParticles.system.visible = (state.mode === 'RANSOM');
-            
-            injectionViruses.forEach(v => { 
-                v.visible = (state.mode === 'INJECT'); 
-                if(state.mode === 'INJECT') v.position.set((Math.random()-0.5)*60, (Math.random()-0.5)*60, -60); 
-            });
-            
-            if(state.mode === 'NORMAL') traffic.system.material.color.setHex(0x00e5ff); 
-            if(state.mode === 'DDOS') traffic.system.material.color.setHex(0xff1744);
 
-            nodesGroup.children.forEach(c => { 
-                if(c.type === "Mesh") { 
-                    c.material.color.setHex(0xff3300); 
-                    c.material.emissive.setHex(0xff6600); 
-                    c.userData.isRogue = false; 
+            traffic.system.visible = (state.mode === 'NORMAL' || state.mode === 'DDOS');
+            brute.system.visible = (state.mode === 'BRUTE');
+            apt.system.visible = (state.mode === 'APT');
+            exfil.system.visible = (state.mode === 'EXFIL');
+            ransomParticles.system.visible = (state.mode === 'RANSOM');
+
+            injectionViruses.forEach(v => {
+                v.visible = (state.mode === 'INJECT');
+                if (state.mode === 'INJECT') v.position.set((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 60, -60);
+            });
+
+            if (state.mode === 'NORMAL') traffic.system.material.color.setHex(0x00e5ff);
+            if (state.mode === 'DDOS') traffic.system.material.color.setHex(0xff1744);
+
+            nodesGroup.children.forEach(c => {
+                if (c.type === "Mesh") {
+                    c.material.color.setHex(0xff3300);
+                    c.material.emissive.setHex(0xff6600);
+                    c.userData.isRogue = false;
                 }
             });
-            
-            if(state.mode === 'INSIDER') {
-                const rogueNode = nodesGroup.children[Math.floor(Math.random() * 6)]; 
-                if(rogueNode && rogueNode.type === "Mesh") { rogueNode.material.color.setHex(0xff1744); rogueNode.material.emissive.setHex(0xff1744); rogueNode.userData.isRogue = true; }
+
+            if (state.mode === 'INSIDER') {
+                const rogueNode = nodesGroup.children[Math.floor(Math.random() * 6)];
+                if (rogueNode && rogueNode.type === "Mesh") { rogueNode.material.color.setHex(0xff1744); rogueNode.material.emissive.setHex(0xff1744); rogueNode.userData.isRogue = true; }
             }
-            if(state.mode !== 'RANSOM' && state.ransomLocked) { state.ransomLocked = false; }
+            if (state.mode !== 'RANSOM' && state.ransomLocked) { state.ransomLocked = false; }
 
             // --- SOAR AUTOMATED RESPONSE (Initial Triggers) ---
             if (previousMode === 'NORMAL' && newMode !== 'NORMAL') {
                 addLog("SOAR: Threat detected. Initiating automated countermeasures.", "warn");
 
                 // Note: Quantum Armor is now held back and deployed dynamically based on health!
-                
-                if(!state.def.scan) {
-                    state.def.scan = true; 
+
+                if (!state.def.scan) {
+                    state.def.scan = true;
                     scanGrid.visible = true;
                     addLog("SOAR: Heuristic Deep Scan engaged.", "info");
                 }
 
-                if(!state.def.interceptor) {
+                if (!state.def.interceptor) {
                     state.def.interceptor = true;
                     state.def.interceptorEnergy = 100;
                     state.def.interceptorStatus = 'ACTIVE';
@@ -391,57 +653,57 @@
         }
 
         socket.on('omni_sync', (data) => {
-            if (data.cmd === 'zoom') { camera.position.setLength(data.val); controls.update(); } 
-            else if (data.cmd === 'setMode') { if(state.autoPilot) { state.autoPilot = false; } setMode(data.val); } 
-            else if (data.cmd === 'setAutoPilot') { state.autoPilot = data.val; if(state.autoPilot) state.nextModeShift = performance.now() + 5000; } 
-            else if (data.cmd === 'setSoar') { state.soarActive = data.val; } 
+            if (data.cmd === 'zoom') { camera.position.setLength(data.val); controls.update(); }
+            else if (data.cmd === 'setMode') { if (state.autoPilot) { state.autoPilot = false; } setMode(data.val); }
+            else if (data.cmd === 'setAutoPilot') { state.autoPilot = data.val; if (state.autoPilot) state.nextModeShift = performance.now() + 5000; }
+            else if (data.cmd === 'setSoar') { state.soarActive = data.val; }
             else if (data.cmd === 'btnClick') {
-                switch(data.id) {
+                switch (data.id) {
                     case 'btnInterceptor': state.def.interceptor = !state.def.interceptor; break;
                     case 'btnDeepScan': state.def.scan = !state.def.scan; scanGrid.visible = state.def.scan; break;
-                    case 'btnHoneypot': if(!state.def.hpActive) { state.def.hpActive = true; honeypotGroup.visible = true; setTimeout(() => { state.def.hpActive = false; honeypotGroup.visible = false; }, 8000); } break;
-                    case 'btnSignatures': setTimeout(() => { if(state.mode === 'INJECT' || state.mode === 'RANSOM') state.purged++; }, 1500); break;
-                    case 'btnBlackhole': for(let i=0; i<traffic.count*3; i+=3) { traffic.positions[i] *= 3; traffic.positions[i+1] *= 3; traffic.positions[i+2] *= 3; } traffic.system.geometry.attributes.position.needsUpdate = true; break;
-                    case 'btnQuantum': if(!state.def.quantumActive) { state.def.quantumActive = true; shockwaveGroup.visible = true; state.def.qScale = 1; Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); setTimeout(() => { state.def.quantumActive = false; }, 4000); } break;
-                    case 'btnEMP': if(!state.def.empActive) { state.def.empActive = true; empSphere.visible = true; state.def.empScale = 0.1; [traffic, brute, apt, exfil, ransomParticles].forEach(sys => { for(let i=0; i<sys.count*3; i+=3) { spawnOuter(sys.positions, i, 220, 320); } sys.system.geometry.attributes.position.needsUpdate = true; }); if(state.mode === 'RANSOM') { setMode('NORMAL'); if(state.autoPilot) state.nextModeShift = performance.now() + 5000;} } break;
+                    case 'btnHoneypot': if (!state.def.hpActive) { state.def.hpActive = true; honeypotGroup.visible = true; setTimeout(() => { state.def.hpActive = false; honeypotGroup.visible = false; }, 8000); } break;
+                    case 'btnSignatures': setTimeout(() => { if (state.mode === 'INJECT' || state.mode === 'RANSOM') state.purged++; }, 1500); break;
+                    case 'btnBlackhole': for (let i = 0; i < traffic.count * 3; i += 3) { traffic.positions[i] *= 3; traffic.positions[i + 1] *= 3; traffic.positions[i + 2] *= 3; } traffic.system.geometry.attributes.position.needsUpdate = true; break;
+                    case 'btnQuantum': if (!state.def.quantumActive) { state.def.quantumActive = true; shockwaveGroup.visible = true; state.def.qScale = 1; Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); setTimeout(() => { state.def.quantumActive = false; }, 4000); } break;
+                    case 'btnEMP': if (!state.def.empActive) { state.def.empActive = true; empSphere.visible = true; state.def.empScale = 0.1;[traffic, brute, apt, exfil, ransomParticles].forEach(sys => { for (let i = 0; i < sys.count * 3; i += 3) { spawnOuter(sys.positions, i, 220, 320); } sys.system.geometry.attributes.position.needsUpdate = true; }); if (state.mode === 'RANSOM') { setMode('NORMAL'); if (state.autoPilot) state.nextModeShift = performance.now() + 5000; } } break;
 
-                    case 'btnRepair': Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.serverBreached = false; state.encryptionIntegrity = 100; state.startTime = Date.now(); state.vault.remaining = 10000; state.vault.status = 'SECURE'; if(state.ransomLocked) setMode('NORMAL'); break;
+                    case 'btnRepair': Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.serverBreached = false; state.encryptionIntegrity = 100; state.startTime = Date.now(); state.vault.remaining = 10000; state.vault.status = 'SECURE'; if (state.ransomLocked) setMode('NORMAL'); break;
 
                 }
             } else if (data.cmd === 'vigourSuccess') {
-                Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.purged += 5; 
+                Object.keys(state.health).forEach(k => state.health[k] = state.maxHealth[k]); state.purged += 5;
                 serverMesh.material.emissive.setHex(0x00e5ff); setTimeout(() => serverMesh.material.emissive.setHex(0x0011aa), 1000);
-                if(state.ransomLocked) { state.ransomLocked = false; } setMode('NORMAL'); if(state.autoPilot) state.nextModeShift = performance.now() + 5000;
+                if (state.ransomLocked) { state.ransomLocked = false; } setMode('NORMAL'); if (state.autoPilot) state.nextModeShift = performance.now() + 5000;
             }
         });
 
         // ==========================================
         //         SCENE SETUP & LIGHTING
         // ==========================================
-        const scene = new THREE.Scene(); 
-        scene.fog = new THREE.FogExp2(0x02040a, 0.002); 
-        
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000); 
-        camera.position.set(0, 30, 550); 
-        
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" }); 
-        renderer.setSize(window.innerWidth, window.innerHeight); 
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x02040a, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 30, 550);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.getElementById('webgl-container').appendChild(renderer.domElement);
-        
-        const controls = new THREE.OrbitControls(camera, renderer.domElement); 
-        controls.enableDamping = true; controls.dampingFactor = 0.05; controls.maxDistance = 800; controls.minDistance = 10; controls.autoRotate = false; controls.target.set(0, 40, 0); controls.update(); 
-        
-        scene.add(new THREE.AmbientLight(0x222233)); 
-        const coreLight = new THREE.PointLight(0x00aaff, 2.5, 150); coreLight.position.set(0,0,0); scene.add(coreLight); 
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; controls.dampingFactor = 0.05; controls.maxDistance = 800; controls.minDistance = 10; controls.autoRotate = false; controls.target.set(0, 40, 0); controls.update();
+
+        scene.add(new THREE.AmbientLight(0x222233));
+        const coreLight = new THREE.PointLight(0x00aaff, 2.5, 150); coreLight.position.set(0, 0, 0); scene.add(coreLight);
         const blueLight = new THREE.PointLight(0x00e5ff, 1.5, 200); blueLight.position.set(50, 50, 50); scene.add(blueLight);
-        
+
         const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
 
-        const dustGeo = new THREE.BufferGeometry(); const dustPos = new Float32Array(6000); 
-        for(let i=0; i<6000; i++) dustPos[i] = (Math.random() - 0.5) * 1200; 
+        const dustGeo = new THREE.BufferGeometry(); const dustPos = new Float32Array(6000);
+        for (let i = 0; i < 6000; i++) dustPos[i] = (Math.random() - 0.5) * 1200;
         dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-        const backgroundDust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: 0x00b2ff, size: 1.2, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false })); 
+        const backgroundDust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: 0x00b2ff, size: 1.2, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false }));
         scene.add(backgroundDust);
 
         // --- HOLOGRAPHIC SHADER ---
@@ -468,113 +730,113 @@
                 `,
                 transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.FrontSide, wireframe: true
             });
-            mat.color = matColor; mat.emissive = new THREE.Color(colorHex); 
-            Object.defineProperty(mat, 'opacity', { get: function() { return this.uniforms.uOpacity.value; }, set: function(v) { this.uniforms.uOpacity.value = v; }});
+            mat.color = matColor; mat.emissive = new THREE.Color(colorHex);
+            Object.defineProperty(mat, 'opacity', { get: function () { return this.uniforms.uOpacity.value; }, set: function (v) { this.uniforms.uOpacity.value = v; } });
             return mat;
         }
 
         // 2. The Data Vault: Sharp Navy Blue Icosahedron Core (Restored flat geometry!)
-        const coreGeo = new THREE.IcosahedronGeometry(22, 0); 
+        const coreGeo = new THREE.IcosahedronGeometry(22, 0);
         const coreMat = new THREE.MeshPhongMaterial({
-            color: 0x000033,          
-            emissive: 0x0033ff,       
-            emissiveIntensity: 1.5,   
-            wireframe: false,         
-            flatShading: true,        
+            color: 0x000033,
+            emissive: 0x0033ff,
+            emissiveIntensity: 1.5,
+            wireframe: false,
+            flatShading: true,
             transparent: true,
-            opacity: 0.95             
+            opacity: 0.95
         });
 
         const serverMesh = new THREE.Mesh(coreGeo, coreMat);
         scene.add(serverMesh);
-        
+
         const honeypotGroup = new THREE.Group(); honeypotGroup.visible = false; scene.add(honeypotGroup);
         const scanGrid = new THREE.Mesh(new THREE.SphereGeometry(250, 64, 64), new THREE.MeshPhongMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 1.5, wireframe: true, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending })); scanGrid.visible = false; scene.add(scanGrid);
-        
+
         const shockwaveGroup = new THREE.Group(); shockwaveGroup.visible = false;
-        const swOuter = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 64), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, side: THREE.DoubleSide}));
-        const swInner = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.6, 64), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, side: THREE.DoubleSide}));
+        const swOuter = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 64), new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, side: THREE.DoubleSide }));
+        const swInner = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.6, 64), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, side: THREE.DoubleSide }));
         shockwaveGroup.add(swOuter); shockwaveGroup.add(swInner); scene.add(shockwaveGroup);
-        
-        const empSphere = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), new THREE.MeshBasicMaterial({color: 0xff1744, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending})); empSphere.visible = false; scene.add(empSphere);
+
+        const empSphere = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), new THREE.MeshBasicMaterial({ color: 0xff1744, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending })); empSphere.visible = false; scene.add(empSphere);
 
         const nodesGroup = new THREE.Group(); scene.add(nodesGroup);
         const interceptorLasers = []; const interceptorFlares = [];
-        for(let i=0; i<6; i++) {
+        for (let i = 0; i < 6; i++) {
             let node = new THREE.Mesh(
-                new THREE.BoxGeometry(7, 7, 7), 
-                new THREE.MeshPhongMaterial({color: 0xff3300, emissive: 0xff6600, emissiveIntensity: 1.5})
-            ); 
-            node.position.set(Math.cos(i)*31, 0, Math.sin(i)*31); 
-            node.userData = { isRogue: false, baseHeight: 0, angle: i }; 
+                new THREE.BoxGeometry(7, 7, 7),
+                new THREE.MeshPhongMaterial({ color: 0xff3300, emissive: 0xff6600, emissiveIntensity: 1.5 })
+            );
+            node.position.set(Math.cos(i) * 31, 0, Math.sin(i) * 31);
+            node.userData = { isRogue: false, baseHeight: 0, angle: i };
             nodesGroup.add(node);
-            
-            let laser = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({color: 0xff6600, transparent: true, opacity: 0.9, linewidth: 2})); laser.visible = false; scene.add(laser); interceptorLasers.push(laser);
-            let flare = new THREE.Mesh(new THREE.SphereGeometry(2), new THREE.MeshBasicMaterial({color: 0xffaa00})); flare.visible = false; scene.add(flare); interceptorFlares.push(flare);
+
+            let laser = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.9, linewidth: 2 })); laser.visible = false; scene.add(laser); interceptorLasers.push(laser);
+            let flare = new THREE.Mesh(new THREE.SphereGeometry(2), new THREE.MeshBasicMaterial({ color: 0xffaa00 })); flare.visible = false; scene.add(flare); interceptorFlares.push(flare);
         }
-        const insiderLaser = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({color: 0xff1744, transparent: true, opacity: 1.0, linewidth: 2})); insiderLaser.visible = false; scene.add(insiderLaser);
+        const insiderLaser = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0xff1744, transparent: true, opacity: 1.0, linewidth: 2 })); insiderLaser.visible = false; scene.add(insiderLaser);
 
         const gridHelper = new THREE.GridHelper(400, 40, 0x00e5ff, 0x002aff); gridHelper.position.y = -60; gridHelper.material.opacity = 0.15; gridHelper.material.transparent = true; scene.add(gridHelper);
 
         const layersGroup = new THREE.Group(); scene.add(layersGroup);
         const layerMeshes = {};
-        
+
         // --- RESTORED: Sharp Icosahedrons for layers (Detail = 0) ---
         allPotentialLayers.forEach((l, i) => {
             const m = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), createGlowMat(l.color));
-            m.name = l.id; 
-            m.userData.currentRadius = 1; 
-            m.userData.baseOpac = 0.15; 
-            layerMeshes[l.id] = m; 
+            m.name = l.id;
+            m.userData.currentRadius = 1;
+            m.userData.baseOpac = 0.15;
+            layerMeshes[l.id] = m;
             layersGroup.add(m);
         });
 
         // --- LARGER PARTICLES ---
-        function createParticles(count, size, color, opacity=1.0) {
+        function createParticles(count, size, color, opacity = 1.0) {
             const geo = new THREE.BufferGeometry(); const pos = new Float32Array(count * 3); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
             const mat = new THREE.PointsMaterial({ size: size, color: color, transparent: true, opacity: opacity, blending: THREE.AdditiveBlending, depthWrite: false });
             const points = new THREE.Points(geo, mat); scene.add(points); return { system: points, positions: pos, count: count };
         }
-        
-        const traffic = createParticles(4000, 1.5, 0x00e5ff, 0.8); 
+
+        const traffic = createParticles(4000, 1.5, 0x00e5ff, 0.8);
         const bruteCount = 1000; const bruteGeo = new THREE.BufferGeometry(); const brutePos = new Float32Array(bruteCount * 3); const bruteColors = new Float32Array(bruteCount * 3);
-        for(let i=0; i<bruteCount; i++) { brutePos[i*3] = 180 + (Math.random()-0.5)*40; brutePos[i*3+1] = 60 + (Math.random()-0.5)*40; brutePos[i*3+2] = 140 + (Math.random()-0.5)*40; let cType = Math.random(); let r=1,g=(cType<0.33)?1:(cType<0.66)?0.8:0.9,b=(cType<0.33)?0:(cType<0.66)?0:0.2; bruteColors[i*3]=r; bruteColors[i*3+1]=g; bruteColors[i*3+2]=b; }
+        for (let i = 0; i < bruteCount; i++) { brutePos[i * 3] = 180 + (Math.random() - 0.5) * 40; brutePos[i * 3 + 1] = 60 + (Math.random() - 0.5) * 40; brutePos[i * 3 + 2] = 140 + (Math.random() - 0.5) * 40; let cType = Math.random(); let r = 1, g = (cType < 0.33) ? 1 : (cType < 0.66) ? 0.8 : 0.9, b = (cType < 0.33) ? 0 : (cType < 0.66) ? 0 : 0.2; bruteColors[i * 3] = r; bruteColors[i * 3 + 1] = g; bruteColors[i * 3 + 2] = b; }
         bruteGeo.setAttribute('position', new THREE.BufferAttribute(brutePos, 3)); bruteGeo.setAttribute('color', new THREE.BufferAttribute(bruteColors, 3));
         const bruteSystem = new THREE.Points(bruteGeo, new THREE.PointsMaterial({ size: 4.0, vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })); scene.add(bruteSystem); bruteSystem.visible = false;
         const brute = { system: bruteSystem, positions: brutePos, count: bruteCount };
-        
-        const apt = createParticles(300, 2.5, 0xff0055, 0.9); const exfil = createParticles(250, 2.0, 0x00e5ff, 0.8); const ransomParticles = createParticles(400, 2.5, 0xff1744, 0.9); [apt, exfil, ransomParticles].forEach(p => p.system.visible = false);
+
+        const apt = createParticles(300, 2.5, 0xff0055, 0.9); const exfil = createParticles(250, 2.0, 0x00e5ff, 0.8); const ransomParticles = createParticles(400, 2.5, 0xff1744, 0.9);[apt, exfil, ransomParticles].forEach(p => p.system.visible = false);
         const injectionViruses = []; const virusMat = new THREE.MeshPhongMaterial({ color: 0x00e5ff, emissive: 0x0088ff, blending: THREE.AdditiveBlending, emissiveIntensity: 1.5 }); const virusGeo = new THREE.OctahedronGeometry(3.0);
-        for(let i=0; i<12; i++) { let v = new THREE.Mesh(virusGeo, virusMat); v.visible = false; scene.add(v); injectionViruses.push(v); }
+        for (let i = 0; i < 12; i++) { let v = new THREE.Mesh(virusGeo, virusMat); v.visible = false; scene.add(v); injectionViruses.push(v); }
 
         window.addEventListener('pointerdown', (e) => {
-            if(state.mode !== 'INSIDER') return;
+            if (state.mode !== 'INSIDER') return;
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(nodesGroup.children);
             for (let i = 0; i < intersects.length; i++) {
                 if (intersects[i].object.userData.isRogue) {
-                    intersects[i].object.userData.isRogue = false; 
-                    intersects[i].object.material.color.setHex(0xff3300); 
+                    intersects[i].object.userData.isRogue = false;
+                    intersects[i].object.material.color.setHex(0xff3300);
                     intersects[i].object.material.emissive.setHex(0xff6600);
-                    state.purged += 1; 
+                    state.purged += 1;
                     addLog("Insider threat manually purged by Operator.", "warn");
-                    setTimeout(() => { socket.emit('omni_sync', {type: 'syncMode', mode: 'NORMAL', autoPilot: false}); setMode('NORMAL'); }, 2000); break;
+                    setTimeout(() => { socket.emit('omni_sync', { type: 'syncMode', mode: 'NORMAL', autoPilot: false }); setMode('NORMAL'); }, 2000); break;
                 }
             }
         });
 
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
-        function spawnOuter(posArr, idx, minR=220, maxR=320) { const r = minR + Math.random() * (maxR-minR); const theta = Math.random() * Math.PI * 2; const phi = Math.acos(2 * Math.random() - 1); posArr[idx] = r * Math.sin(phi) * Math.cos(theta); posArr[idx+1] = r * Math.sin(phi) * Math.sin(theta); posArr[idx+2] = r * Math.cos(phi); }
-        function spawnInner(posArr, idx) { const r = 22 + Math.random() * 5; const theta = Math.random() * Math.PI * 2; const phi = Math.acos(2 * Math.random() - 1); posArr[idx] = r * Math.sin(phi) * Math.cos(theta); posArr[idx+1] = r * Math.sin(phi) * Math.sin(theta); posArr[idx+2] = r * Math.cos(phi); }
-        
-        for(let i=0; i<traffic.count*3; i+=3) spawnOuter(traffic.positions, i); 
-        for(let i=0; i<apt.count*3; i+=3) spawnOuter(apt.positions, i); 
-        for(let i=0; i<exfil.count*3; i+=3) spawnInner(exfil.positions, i); 
-        for(let i=0; i<ransomParticles.count*3; i+=3) spawnOuter(ransomParticles.positions, i);
+        function spawnOuter(posArr, idx, minR = 220, maxR = 320) { const r = minR + Math.random() * (maxR - minR); const theta = Math.random() * Math.PI * 2; const phi = Math.acos(2 * Math.random() - 1); posArr[idx] = r * Math.sin(phi) * Math.cos(theta); posArr[idx + 1] = r * Math.sin(phi) * Math.sin(theta); posArr[idx + 2] = r * Math.cos(phi); }
+        function spawnInner(posArr, idx) { const r = 22 + Math.random() * 5; const theta = Math.random() * Math.PI * 2; const phi = Math.acos(2 * Math.random() - 1); posArr[idx] = r * Math.sin(phi) * Math.cos(theta); posArr[idx + 1] = r * Math.sin(phi) * Math.sin(theta); posArr[idx + 2] = r * Math.cos(phi); }
+
+        for (let i = 0; i < traffic.count * 3; i += 3) spawnOuter(traffic.positions, i);
+        for (let i = 0; i < apt.count * 3; i += 3) spawnOuter(apt.positions, i);
+        for (let i = 0; i < exfil.count * 3; i += 3) spawnInner(exfil.positions, i);
+        for (let i = 0; i < ransomParticles.count * 3; i += 3) spawnOuter(ransomParticles.positions, i);
 
         let lastTime = performance.now();
-        
+
         addLog("Omni-Stack Systems Initialized.", "info");
         addLog("Core shielding at maximum capacity.", "info");
 
@@ -589,7 +851,7 @@
             // ==========================================
             //  DYNAMIC REINFORCEMENT & STEALTH ENGINE
             // ==========================================
-           const allHealthy  = allPotentialLayers.filter(l => state.health[l.id] > 0).map(l => l.id);
+            const allHealthy = allPotentialLayers.filter(l => state.health[l.id] > 0).map(l => l.id);
             let visibleLayers = allHealthy.slice(0, 7);
 
             // Set active radius for physics collision BEFORE moving particles
@@ -607,10 +869,10 @@
 
             Object.keys(layerMeshes).forEach((id, index) => {
                 let m = layerMeshes[id];
-                if(m) { 
-                    m.rotation.y += 0.001 * rotSpeed * (index + 1); 
-                    m.rotation.x += 0.0005 * rotSpeed * ((index % 2 === 0) ? 1 : -1); 
-                    m.rotation.z += 0.0003 * rotSpeed * ((index % 3 === 0) ? 1 : -1); 
+                if (m) {
+                    m.rotation.y += 0.001 * rotSpeed * (index + 1);
+                    m.rotation.x += 0.0005 * rotSpeed * ((index % 2 === 0) ? 1 : -1);
+                    m.rotation.z += 0.0003 * rotSpeed * ((index % 3 === 0) ? 1 : -1);
                 }
             });
 
@@ -618,14 +880,14 @@
             backgroundDust.rotation.y += 0.00015 * rotSpeed; backgroundDust.rotation.x += 0.0001 * rotSpeed;
             controls.update();
 
-            if(state.autoPilot && now > state.nextModeShift && !state.serverBreached) { setMode(modes[Math.floor(Math.random() * modes.length)]); state.nextModeShift = now + 12000 + Math.random() * 8000; }
-            
-            if(honeypotGroup.visible) { honeypotGroup.rotation.x += 0.02; honeypotGroup.rotation.y += 0.03; honeypotGroup.position.y = 15 + Math.sin(now * 0.005) * 2; }
-            
-            nodesGroup.children.forEach(c => { 
-                if(c.type === "Mesh") { 
-                    c.position.y = c.userData.baseHeight + Math.sin(now * 0.002 + c.userData.angle) * 1.5; 
-                    c.rotation.y += 0.01; c.rotation.x += 0.01; 
+            if (state.autoPilot && now > state.nextModeShift && !state.serverBreached) { setMode(modes[Math.floor(Math.random() * modes.length)]); state.nextModeShift = now + 12000 + Math.random() * 8000; }
+
+            if (honeypotGroup.visible) { honeypotGroup.rotation.x += 0.02; honeypotGroup.rotation.y += 0.03; honeypotGroup.position.y = 15 + Math.sin(now * 0.005) * 2; }
+
+            nodesGroup.children.forEach(c => {
+                if (c.type === "Mesh") {
+                    c.position.y = c.userData.baseHeight + Math.sin(now * 0.002 + c.userData.angle) * 1.5;
+                    c.rotation.y += 0.01; c.rotation.x += 0.01;
                     if (state.def.interceptorStatus === 'RECHARGING' && !c.userData.isRogue) {
                         c.material.emissiveIntensity = 0.2;
                         c.material.color.setHex(0x551100);
@@ -637,7 +899,7 @@
             });
 
             if (state.def.scan) { scanGrid.rotation.y += 0.01; scanGrid.rotation.z += 0.005; scanGrid.scale.setScalar(1 + Math.sin(now * 0.005) * 0.05); injectionViruses.forEach(v => v.material.emissive.setHex(0xffffff)); } else { injectionViruses.forEach(v => v.material.emissive.setHex(0x0088ff)); }
-            
+
             if (shockwaveGroup.visible) { state.def.qScale += 1.5; shockwaveGroup.scale.setScalar(state.def.qScale); shockwaveGroup.rotation.x += 0.01; shockwaveGroup.rotation.y += 0.02; swOuter.material.opacity = Math.max(0, 0.15 - (state.def.qScale / 500)); swInner.material.opacity = Math.max(0, 0.1 - (state.def.qScale / 800)); if (state.def.qScale > 80) shockwaveGroup.visible = false; }
             if (empSphere.visible) { state.def.empScale += 4; empSphere.scale.setScalar(state.def.empScale); empSphere.material.opacity = Math.max(0, 1.0 - (state.def.empScale / 120)); if (state.def.empScale > 150) { empSphere.visible = false; state.def.empActive = false; } }
 
@@ -645,19 +907,19 @@
             // --- SOAR DYNAMIC PROTECTION LAYER ---
             // ==========================================
             if (state.mode !== 'NORMAL' && !state.serverBreached) {
-                
+
 
                 // 1. DYNAMIC QUANTUM ARMOR (NERFED: Triggers < 20% HP, 30s Cooldown, 2.5s Duration)
                 if (state.health[activeLayerName] < 40 && !state.def.quantumActive && (now - state.lastQuantumTime > 30000)) {
                     addLog(`SOAR: ${activeLayerName.toUpperCase()} critical. Deploying Quantum Armor.`, "warn");
-                    state.def.quantumActive = true; 
-                    shockwaveGroup.visible = true; 
+                    state.def.quantumActive = true;
+                    shockwaveGroup.visible = true;
                     state.def.qScale = 1;
-                    
+
 
                     // Minor emergency boost (+25 instead of +50) so it doesn't instantly die after armor drops
                     state.health[activeLayerName] = Math.min(state.maxHealth[activeLayerName], state.health[activeLayerName] + 25);
-                    
+
                     // Shorter duration (2.5 seconds instead of 4 seconds)
                     setTimeout(() => { state.def.quantumActive = false; }, 2500);
 
@@ -678,19 +940,19 @@
 
 
                     addLog("CRITICAL: Structural failure imminent. SOAR activating EMP.", "alert");
-                    state.def.empActive = true; 
-                    empSphere.visible = true; 
-                    state.def.empScale = 0.1; 
-                    
-                    [traffic, brute, apt, exfil, ransomParticles].forEach(sys => { 
-                        for(let i=0; i<sys.count*3; i+=3) { spawnOuter(sys.positions, i, 350, 550); } 
-                        sys.system.geometry.attributes.position.needsUpdate = true; 
+                    state.def.empActive = true;
+                    empSphere.visible = true;
+                    state.def.empScale = 0.1;
+
+                    [traffic, brute, apt, exfil, ransomParticles].forEach(sys => {
+                        for (let i = 0; i < sys.count * 3; i += 3) { spawnOuter(sys.positions, i, 350, 550); }
+                        sys.system.geometry.attributes.position.needsUpdate = true;
                     });
-                    
-                    if(state.mode === 'RANSOM' || state.mode === 'EXFIL' || state.mode === 'APT') {
+
+                    if (state.mode === 'RANSOM' || state.mode === 'EXFIL' || state.mode === 'APT') {
                         setTimeout(() => {
-                            setMode('NORMAL'); 
-                            if(state.autoPilot) state.nextModeShift = performance.now() + 5000;
+                            setMode('NORMAL');
+                            if (state.autoPilot) state.nextModeShift = performance.now() + 5000;
                         }, 1000);
                     }
                 }
@@ -700,10 +962,10 @@
             if (state.lastActiveLayer !== activeLayerName && state.health[state.lastActiveLayer] <= 0) {
                 addLog(`CRITICAL: ${state.lastActiveLayer.toUpperCase()} breached. System knocked back.`, 'alert');
                 shockwaveGroup.visible = true; state.def.qScale = 1;
-                for(let i=0; i<traffic.count*3; i+=3) spawnOuter(traffic.positions, i, 350, 550); traffic.system.geometry.attributes.position.needsUpdate = true;
-                for(let i=0; i<brute.count*3; i+=3) spawnOuter(brute.positions, i, 350, 550); brute.system.geometry.attributes.position.needsUpdate = true;
-                for(let i=0; i<apt.count*3; i+=3) spawnOuter(apt.positions, i, 350, 550); apt.system.geometry.attributes.position.needsUpdate = true;
-                for(let i=0; i<ransomParticles.count*3; i+=3) spawnOuter(ransomParticles.positions, i, 350, 550); ransomParticles.system.geometry.attributes.position.needsUpdate = true;
+                for (let i = 0; i < traffic.count * 3; i += 3) spawnOuter(traffic.positions, i, 350, 550); traffic.system.geometry.attributes.position.needsUpdate = true;
+                for (let i = 0; i < brute.count * 3; i += 3) spawnOuter(brute.positions, i, 350, 550); brute.system.geometry.attributes.position.needsUpdate = true;
+                for (let i = 0; i < apt.count * 3; i += 3) spawnOuter(apt.positions, i, 350, 550); apt.system.geometry.attributes.position.needsUpdate = true;
+                for (let i = 0; i < ransomParticles.count * 3; i += 3) spawnOuter(ransomParticles.positions, i, 350, 550); ransomParticles.system.geometry.attributes.position.needsUpdate = true;
             }
             state.lastActiveLayer = activeLayerName;
 
@@ -712,7 +974,7 @@
                     visibleLayers.push(activeLayerName);
                 }
             }
-            
+
             if (state.def.scan && state.health['heur'] > 0 && !visibleLayers.includes('heur')) {
                 visibleLayers.push('heur');
             }
@@ -727,13 +989,13 @@
                 const id = layerDef.id;
                 const hp = state.health[id] || 0;
                 const max = state.maxHealth[id] || 100;
-                const pct = Math.max(0, (hp/max)*100);
-                
+                const pct = Math.max(0, (hp / max) * 100);
+
                 const mesh = layerMeshes[id];
                 const wrapper = document.getElementById('wrapper-' + id);
                 const txt = document.getElementById('txt-' + id);
                 const svgFill = document.getElementById('svg-' + id);
-                
+
                 const visIndex = visibleLayers.indexOf(id);
                 const isVisible = (visIndex !== -1);
 
@@ -742,22 +1004,22 @@
                     if (isVisible) {
                         targetRadius = nonUniformRadii[visIndex] || 45;
                     } else if (hp > 0) {
-                        targetRadius = 1; 
+                        targetRadius = 1;
                     } else {
-                        targetRadius = 0; 
+                        targetRadius = 0;
                     }
 
                     mesh.userData.currentRadius += (targetRadius - mesh.userData.currentRadius) * 0.05;
-                    
+
                     if (mesh.userData.currentRadius > 1) {
                         mesh.visible = true;
-                        
-                        let opacity = (hp/max) * (mesh.userData.baseOpac || 0.15) * 2.0; 
+
+                        let opacity = (hp / max) * (mesh.userData.baseOpac || 0.15) * 2.0;
                         if (id === activeLayerName && state.mode !== 'NORMAL') opacity = Math.min(1.0, opacity + 0.3);
                         mesh.material.opacity = state.def.quantumActive ? 0.8 : opacity;
-                        
+
                         let finalScale = mesh.userData.currentRadius;
-                        if (isVisible) finalScale += Math.sin(now * 0.002 + index * 0.5) * (hp / 150); 
+                        if (isVisible) finalScale += Math.sin(now * 0.002 + index * 0.5) * (hp / 150);
                         mesh.scale.setScalar(finalScale);
 
                         if (pct < 40 && !state.def.quantumActive) {
@@ -768,7 +1030,7 @@
                             mesh.material.emissive.setHex(parseInt(hexStr.replace('#', '0x')));
                         }
                     } else {
-                        mesh.visible = false; 
+                        mesh.visible = false;
                     }
                 }
 
@@ -776,7 +1038,7 @@
                     if (isVisible) {
                         const angleStep = Math.min(18, 140 / Math.max(1, totalVis - 1));
                         const angle = (visIndex - (totalVis - 1) / 2) * angleStep;
-                        
+
                         wrapper.style.transform = `rotate(${angle}deg) translateY(-580px) rotate(${-angle}deg)`;
                         wrapper.style.opacity = '1';
                         wrapper.style.visibility = 'visible';
@@ -787,7 +1049,7 @@
 
                         txt.style.color = barColor;
                         txt.style.textShadow = `0 0 10px ${barColor}, 0 0 20px ${barColor}`;
-                        
+
                         svgFill.style.strokeDashoffset = 251.2 - (pct / 100) * 251.2;
                         svgFill.style.stroke = barColor;
                         svgFill.style.filter = `drop-shadow(0 0 8px ${barColor})`;
@@ -798,20 +1060,20 @@
                 }
             });
 
-            let isImmune = state.def.quantumActive; 
+            let isImmune = state.def.quantumActive;
             let dmgMult = 1.0;
 
 
 
             if (state.def.interceptor) {
                 if (state.def.interceptorStatus === 'ACTIVE') {
-                    state.def.interceptorEnergy -= (dt * 20); 
+                    state.def.interceptorEnergy -= (dt * 20);
                     if (state.def.interceptorEnergy <= 0) {
                         state.def.interceptorStatus = 'RECHARGING';
                         addLog("Interceptors depleted. Recharging...", "warn");
                     }
                 } else if (state.def.interceptorStatus === 'RECHARGING') {
-                    state.def.interceptorEnergy += (dt * 10); 
+                    state.def.interceptorEnergy += (dt * 10);
                     if (state.def.interceptorEnergy >= 100) {
                         state.def.interceptorEnergy = 100;
                         state.def.interceptorStatus = 'ACTIVE';
@@ -820,161 +1082,161 @@
                 }
 
                 if (state.def.interceptorStatus === 'ACTIVE' && (state.mode === 'DDOS' || state.mode === 'BRUTE' || state.mode === 'RANSOM')) {
-                    const targetSys = state.mode === 'DDOS' ? traffic : (state.mode === 'RANSOM' ? ransomParticles : brute); 
+                    const targetSys = state.mode === 'DDOS' ? traffic : (state.mode === 'RANSOM' ? ransomParticles : brute);
                     let nodeIdx = 0;
-                    
+
                     // NERFED: 1% chance per frame per node
                     nodesGroup.children.forEach(child => {
                         if (child.type === "Mesh" && !child.userData.isRogue) {
                             let found = false;
                             let pIdx = 0; let px, py, pz, distSq;
-                            
+
                             if (Math.random() > 0.99) {
                                 pIdx = Math.floor(Math.random() * targetSys.count) * 3;
-                                px = targetSys.positions[pIdx]; py = targetSys.positions[pIdx+1]; pz = targetSys.positions[pIdx+2];
-                                distSq = (px*px + py*py + pz*pz);
+                                px = targetSys.positions[pIdx]; py = targetSys.positions[pIdx + 1]; pz = targetSys.positions[pIdx + 2];
+                                distSq = (px * px + py * py + pz * pz);
                                 if (distSq > 400 && distSq < 90000) { found = true; }
                             }
 
                             let laser = interceptorLasers[nodeIdx]; let flare = interceptorFlares[nodeIdx];
-                            
+
                             if (found) {
-                                laser.visible = true; flare.visible = true; 
+                                laser.visible = true; flare.visible = true;
                                 let nodeWorld = new THREE.Vector3(); child.getWorldPosition(nodeWorld);
-                                let posArr = laser.geometry.attributes.position.array; 
-                                posArr[0] = nodeWorld.x; posArr[1] = nodeWorld.y; posArr[2] = nodeWorld.z; 
-                                posArr[3] = px; posArr[4] = py; posArr[5] = pz; 
+                                let posArr = laser.geometry.attributes.position.array;
+                                posArr[0] = nodeWorld.x; posArr[1] = nodeWorld.y; posArr[2] = nodeWorld.z;
+                                posArr[3] = px; posArr[4] = py; posArr[5] = pz;
                                 laser.geometry.attributes.position.needsUpdate = true;
-                                
+
                                 flare.position.set(px, py, pz); flare.scale.setScalar(1 + Math.random() * 1.5);
-                                
+
                                 targetSys.positions[pIdx] = 999999;
-                                targetSys.positions[pIdx+1] = 999999;
-                                targetSys.positions[pIdx+2] = 999999;
-                                
+                                targetSys.positions[pIdx + 1] = 999999;
+                                targetSys.positions[pIdx + 2] = 999999;
+
                                 state.purged++;
-                            } else { 
-                                laser.visible = false; flare.visible = false; 
+                            } else {
+                                laser.visible = false; flare.visible = false;
                             }
                             nodeIdx++;
                         }
                     });
                 } else {
-                    interceptorLasers.forEach(l => l.visible = false); interceptorFlares.forEach(f => f.visible = false); 
+                    interceptorLasers.forEach(l => l.visible = false); interceptorFlares.forEach(f => f.visible = false);
                 }
-            } else { 
-                interceptorLasers.forEach(l => l.visible = false); interceptorFlares.forEach(f => f.visible = false); 
+            } else {
+                interceptorLasers.forEach(l => l.visible = false); interceptorFlares.forEach(f => f.visible = false);
             }
 
             if (state.mode === 'NORMAL' || state.mode === 'DDOS') {
                 let limit = state.mode === 'NORMAL' ? 800 : traffic.count; let speed = state.mode === 'NORMAL' ? 0.35 : 1.0; let dmg = 0;
-                for(let i=0; i<limit; i++) {
-                    let idx = i*3; let x = traffic.positions[idx], y = traffic.positions[idx+1], z = traffic.positions[idx+2]; let distSq = (x*x + y*y + z*z);
-                    if (distSq > 0) { let dist = Math.sqrt(distSq); traffic.positions[idx] -= (x/dist)*speed; traffic.positions[idx+1] -= (y/dist)*speed; traffic.positions[idx+2] -= (z/dist)*speed; }
+                for (let i = 0; i < limit; i++) {
+                    let idx = i * 3; let x = traffic.positions[idx], y = traffic.positions[idx + 1], z = traffic.positions[idx + 2]; let distSq = (x * x + y * y + z * z);
+                    if (distSq > 0) { let dist = Math.sqrt(distSq); traffic.positions[idx] -= (x / dist) * speed; traffic.positions[idx + 1] -= (y / dist) * speed; traffic.positions[idx + 2] -= (z / dist) * speed; }
                     if (distSq <= activeTargetRadiusSq) { spawnOuter(traffic.positions, idx); if (state.mode === 'DDOS' && !isImmune) dmg++; }
                 }
-                if (state.mode === 'DDOS' && !isImmune) { 
-                    if (activeLayerName !== 'server') { 
-                        state.health[activeLayerName] -= (dmg * 0.05 * dmgMult); 
-                        if(Math.random()>0.8) triggerShakeFlag=true; 
-                    } else { 
-                        if(dmg > 0) { state.serverBreached = true; state.vault.remaining -= 20; }
-                    } 
+                if (state.mode === 'DDOS' && !isImmune) {
+                    if (activeLayerName !== 'server') {
+                        state.health[activeLayerName] -= (dmg * 0.05 * dmgMult);
+                        if (Math.random() > 0.8) triggerShakeFlag = true;
+                    } else {
+                        if (dmg > 0) { state.serverBreached = true; state.vault.remaining -= 20; }
+                    }
                 }
                 traffic.system.geometry.attributes.position.needsUpdate = true;
             }
 
             if (state.mode === 'BRUTE') {
                 let hit = false; let sourceX = 180, sourceY = 60, sourceZ = 140;
-                for(let i=0; i<brute.count; i++) {
-                    let idx = i*3; let x = brute.positions[idx]; let y = brute.positions[idx+1]; let z = brute.positions[idx+2]; let dist = Math.sqrt(x*x + y*y + z*z);
-                    if (dist > activeTargetRadius && dist > 5) { let speed = 0.8 + Math.random() * 2.0; brute.positions[idx] -= (x/dist) * speed + (Math.random()-0.5)*1.5; brute.positions[idx+1] -= (y/dist) * speed + (Math.random()-0.5)*1.5; brute.positions[idx+2] -= (z/dist) * speed + (Math.random()-0.5)*1.5; } else { brute.positions[idx] = sourceX + (Math.random()-0.5)*40; brute.positions[idx+1] = sourceY + (Math.random()-0.5)*40; brute.positions[idx+2] = sourceZ + (Math.random()-0.5)*40; hit = true; if (!isImmune) { if (activeLayerName !== 'server') { state.health[activeLayerName] -= (0.15 * dmgMult); } else { state.serverBreached = true; state.vault.remaining -= 20; } } }
+                for (let i = 0; i < brute.count; i++) {
+                    let idx = i * 3; let x = brute.positions[idx]; let y = brute.positions[idx + 1]; let z = brute.positions[idx + 2]; let dist = Math.sqrt(x * x + y * y + z * z);
+                    if (dist > activeTargetRadius && dist > 5) { let speed = 0.8 + Math.random() * 2.0; brute.positions[idx] -= (x / dist) * speed + (Math.random() - 0.5) * 1.5; brute.positions[idx + 1] -= (y / dist) * speed + (Math.random() - 0.5) * 1.5; brute.positions[idx + 2] -= (z / dist) * speed + (Math.random() - 0.5) * 1.5; } else { brute.positions[idx] = sourceX + (Math.random() - 0.5) * 40; brute.positions[idx + 1] = sourceY + (Math.random() - 0.5) * 40; brute.positions[idx + 2] = sourceZ + (Math.random() - 0.5) * 40; hit = true; if (!isImmune) { if (activeLayerName !== 'server') { state.health[activeLayerName] -= (0.15 * dmgMult); } else { state.serverBreached = true; state.vault.remaining -= 20; } } }
                 }
-                if(hit && Math.random() > 0.8) triggerShakeFlag=true; brute.system.geometry.attributes.position.needsUpdate = true;
+                if (hit && Math.random() > 0.8) triggerShakeFlag = true; brute.system.geometry.attributes.position.needsUpdate = true;
             }
 
             if (state.mode === 'INJECT') {
                 let tX = state.def.hpActive ? honeypotGroup.position.x : 0, tY = state.def.hpActive ? honeypotGroup.position.y : 0, tZ = state.def.hpActive ? honeypotGroup.position.z : 0;
                 injectionViruses.forEach(v => {
-                    v.rotation.x += 0.1; v.rotation.y += 0.1; let dx = tX - v.position.x, dy = tY - v.position.y, dz = tZ - v.position.z; let distToTarget = Math.sqrt(dx*dx + dy*dy + dz*dz); let speed = state.def.scan ? 0.08 : 0.35; 
-                    if (distToTarget > 0.5) { v.position.x += (dx/distToTarget)*speed; v.position.y += (dy/distToTarget)*speed; v.position.z += (dz/distToTarget)*speed; }
-                    if (!state.def.hpActive) { 
-                        let hitRadius = state.def.scan ? activeTargetRadius : (layerMeshes['ips'] ? layerMeshes['ips'].userData.currentRadius : 40); 
+                    v.rotation.x += 0.1; v.rotation.y += 0.1; let dx = tX - v.position.x, dy = tY - v.position.y, dz = tZ - v.position.z; let distToTarget = Math.sqrt(dx * dx + dy * dy + dz * dz); let speed = state.def.scan ? 0.08 : 0.35;
+                    if (distToTarget > 0.5) { v.position.x += (dx / distToTarget) * speed; v.position.y += (dy / distToTarget) * speed; v.position.z += (dz / distToTarget) * speed; }
+                    if (!state.def.hpActive) {
+                        let hitRadius = state.def.scan ? activeTargetRadius : (layerMeshes['ips'] ? layerMeshes['ips'].userData.currentRadius : 40);
                         let targetLayer = state.def.scan ? activeLayerName : 'ips';
-                        if (distToTarget < hitRadius || (state.health.waf > 0 && distToTarget < (layerMeshes['waf'] ? layerMeshes['waf'].userData.currentRadius : 80))) { 
-                            if (!isImmune) { 
-                                if(state.health.waf > 0) { state.health.waf -= 2.0; } 
-                                else if (targetLayer !== 'server' && state.health[targetLayer] > 0) { state.health[targetLayer] -= 2.0; triggerShakeFlag=true; } 
-                                else { state.serverBreached = true; state.vault.remaining -= 20;} 
-                            } 
-                            v.position.set((Math.random()-0.5)*60, (Math.random()-0.5)*60, -60); 
+                        if (distToTarget < hitRadius || (state.health.waf > 0 && distToTarget < (layerMeshes['waf'] ? layerMeshes['waf'].userData.currentRadius : 80))) {
+                            if (!isImmune) {
+                                if (state.health.waf > 0) { state.health.waf -= 2.0; }
+                                else if (targetLayer !== 'server' && state.health[targetLayer] > 0) { state.health[targetLayer] -= 2.0; triggerShakeFlag = true; }
+                                else { state.serverBreached = true; state.vault.remaining -= 20; }
+                            }
+                            v.position.set((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 60, -60);
                         }
-                    } else if (distToTarget < 3) { v.position.set((Math.random()-0.5)*60, (Math.random()-0.5)*60, -60); } 
+                    } else if (distToTarget < 3) { v.position.set((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 60, -60); }
                 });
             }
 
             if (state.mode === 'APT') {
                 let tX = state.def.hpActive ? honeypotGroup.position.x : 0, tY = state.def.hpActive ? honeypotGroup.position.y : 0, tZ = state.def.hpActive ? honeypotGroup.position.z : 0; let speed = state.def.scan ? 0.08 : 0.25;
-                for(let i=0; i<apt.count; i++) {
-                    let idx = i*3; let dx = tX - apt.positions[idx], dy = tY - apt.positions[idx+1], dz = tZ - apt.positions[idx+2]; let dist = Math.sqrt(dx*dx + dy*dy + dz*dz); let trgR = state.def.hpActive ? 5.5 : activeTargetRadius + 0.5;
-                    if (dist > trgR) { apt.positions[idx] += (dx/dist)*speed; apt.positions[idx+1] += (dy/dist)*speed; apt.positions[idx+2] += (dz/dist)*speed; } else { apt.positions[idx] += (Math.random()-0.5)*0.3; apt.positions[idx+1] += (Math.random()-0.5)*0.3; apt.positions[idx+2] += (Math.random()-0.5)*0.3; if (!state.def.hpActive && !isImmune) { if (activeLayerName !== 'server') state.health[activeLayerName] -= 0.05; else { state.serverBreached = true; state.vault.remaining -= 20; } } }
+                for (let i = 0; i < apt.count; i++) {
+                    let idx = i * 3; let dx = tX - apt.positions[idx], dy = tY - apt.positions[idx + 1], dz = tZ - apt.positions[idx + 2]; let dist = Math.sqrt(dx * dx + dy * dy + dz * dz); let trgR = state.def.hpActive ? 5.5 : activeTargetRadius + 0.5;
+                    if (dist > trgR) { apt.positions[idx] += (dx / dist) * speed; apt.positions[idx + 1] += (dy / dist) * speed; apt.positions[idx + 2] += (dz / dist) * speed; } else { apt.positions[idx] += (Math.random() - 0.5) * 0.3; apt.positions[idx + 1] += (Math.random() - 0.5) * 0.3; apt.positions[idx + 2] += (Math.random() - 0.5) * 0.3; if (!state.def.hpActive && !isImmune) { if (activeLayerName !== 'server') state.health[activeLayerName] -= 0.05; else { state.serverBreached = true; state.vault.remaining -= 20; } } }
                 }
                 apt.system.geometry.attributes.position.needsUpdate = true;
             }
 
             if (state.mode === 'INSIDER') {
-                let rogueNode = null; nodesGroup.children.forEach(c => { if(c.userData.isRogue) rogueNode = c; });
-                if(rogueNode) {
+                let rogueNode = null; nodesGroup.children.forEach(c => { if (c.userData.isRogue) rogueNode = c; });
+                if (rogueNode) {
                     let nodeWorld = new THREE.Vector3(); rogueNode.getWorldPosition(nodeWorld); insiderLaser.visible = true; insiderLaser.material.opacity = 0.5 + Math.sin(now * 0.02) * 0.5;
                     let posArr = insiderLaser.geometry.attributes.position.array; posArr[0] = nodeWorld.x; posArr[1] = nodeWorld.y; posArr[2] = nodeWorld.z;
                     let hitPoint = nodeWorld.clone().normalize().multiplyScalar(activeTargetRadius); posArr[3] = hitPoint.x; posArr[4] = hitPoint.y; posArr[5] = hitPoint.z; insiderLaser.geometry.attributes.position.needsUpdate = true;
-                    if (!isImmune) { if (activeLayerName !== 'server') { state.health[activeLayerName] -= 0.3; triggerShakeFlag=true; } else { state.serverBreached = true; state.vault.remaining -= 20; } }
+                    if (!isImmune) { if (activeLayerName !== 'server') { state.health[activeLayerName] -= 0.3; triggerShakeFlag = true; } else { state.serverBreached = true; state.vault.remaining -= 20; } }
                 } else { insiderLaser.visible = false; }
             } else { insiderLaser.visible = false; }
 
             if (state.mode === 'EXFIL') {
-                for(let i=0; i<exfil.count; i++) {
-                    let idx = i*3; let x = exfil.positions[idx], y = exfil.positions[idx+1], z = exfil.positions[idx+2]; let dist = Math.sqrt(x*x + y*y + z*z);
-                    exfil.positions[idx] += (x/dist)*0.4; exfil.positions[idx+1] += (y/dist)*0.4; exfil.positions[idx+2] += (z/dist)*0.4;
-                    if (dist > 180) { spawnInner(exfil.positions, idx); if(!isImmune && activeLayerName !== 'server') { state.health[activeLayerName] -= 0.3; } else if (!isImmune) { state.serverBreached = true; if(state.vault.remaining > 0) { state.vault.remaining -= 1.5; state.vault.status = 'CRITICAL: EXFILTRATION IN PROGRESS'; } } }
+                for (let i = 0; i < exfil.count; i++) {
+                    let idx = i * 3; let x = exfil.positions[idx], y = exfil.positions[idx + 1], z = exfil.positions[idx + 2]; let dist = Math.sqrt(x * x + y * y + z * z);
+                    exfil.positions[idx] += (x / dist) * 0.4; exfil.positions[idx + 1] += (y / dist) * 0.4; exfil.positions[idx + 2] += (z / dist) * 0.4;
+                    if (dist > 180) { spawnInner(exfil.positions, idx); if (!isImmune && activeLayerName !== 'server') { state.health[activeLayerName] -= 0.3; } else if (!isImmune) { state.serverBreached = true; if (state.vault.remaining > 0) { state.vault.remaining -= 1.5; state.vault.status = 'CRITICAL: EXFILTRATION IN PROGRESS'; } } }
                 }
                 exfil.system.geometry.attributes.position.needsUpdate = true;
             }
 
             if (state.mode === 'RANSOM') {
-                for(let i=0; i<ransomParticles.count; i++) {
-                    let idx = i*3; let x = ransomParticles.positions[idx], y = ransomParticles.positions[idx+1], z = ransomParticles.positions[idx+2]; let distSq = (x*x + y*y + z*z);
-                    if (distSq > activeTargetRadiusSq) { let dist = Math.sqrt(distSq); ransomParticles.positions[idx] -= (x/dist)*0.45; ransomParticles.positions[idx+1] -= (y/dist)*0.45; ransomParticles.positions[idx+2] -= (z/dist)*0.45; } else { ransomParticles.positions[idx] += (Math.random()-0.5)*1.5; ransomParticles.positions[idx+1] += (Math.random()-0.5)*1.5; ransomParticles.positions[idx+2] += (Math.random()-0.5)*1.5; if (!isImmune) { if (activeLayerName !== 'server') { state.health[activeLayerName] -= (0.2 * dmgMult); if(Math.random()>0.9) triggerShakeFlag=true; } else { state.serverBreached = true; state.vault.status = 'LOCKED: RANSOMWARE ENCRYPTION'; state.vault.remaining -= 20; } } }
+                for (let i = 0; i < ransomParticles.count; i++) {
+                    let idx = i * 3; let x = ransomParticles.positions[idx], y = ransomParticles.positions[idx + 1], z = ransomParticles.positions[idx + 2]; let distSq = (x * x + y * y + z * z);
+                    if (distSq > activeTargetRadiusSq) { let dist = Math.sqrt(distSq); ransomParticles.positions[idx] -= (x / dist) * 0.45; ransomParticles.positions[idx + 1] -= (y / dist) * 0.45; ransomParticles.positions[idx + 2] -= (z / dist) * 0.45; } else { ransomParticles.positions[idx] += (Math.random() - 0.5) * 1.5; ransomParticles.positions[idx + 1] += (Math.random() - 0.5) * 1.5; ransomParticles.positions[idx + 2] += (Math.random() - 0.5) * 1.5; if (!isImmune) { if (activeLayerName !== 'server') { state.health[activeLayerName] -= (0.2 * dmgMult); if (Math.random() > 0.9) triggerShakeFlag = true; } else { state.serverBreached = true; state.vault.status = 'LOCKED: RANSOMWARE ENCRYPTION'; state.vault.remaining -= 20; } } }
                 }
                 ransomParticles.system.geometry.attributes.position.needsUpdate = true;
             }
 
-            if (state.serverBreached) { 
-                serverMesh.material.color.setHex(0xff1744); 
-                serverMesh.material.emissive.setHex(0x440011); 
-            } else { 
-                serverMesh.material.color.setHex(0x000033); 
-                serverMesh.material.emissive.setHex(0x0033ff); 
+            if (state.serverBreached) {
+                serverMesh.material.color.setHex(0xff1744);
+                serverMesh.material.emissive.setHex(0x440011);
+            } else {
+                serverMesh.material.color.setHex(0x000033);
+                serverMesh.material.emissive.setHex(0x0033ff);
             }
 
 
 
-            const vVal = document.getElementById('vault-val'); 
+            const vVal = document.getElementById('vault-val');
             const vStat = document.getElementById('vault-status');
-            
+
             if (state.serverBreached === false && state.vault.remaining >= 10000) {
                 state.vault.status = 'SECURE';
             }
-            
-            if(vVal && vStat) {
+
+            if (vVal && vStat) {
                 if (state.serverBreached || state.vault.remaining < 10000) {
                     vStat.innerText = state.vault.status === 'SECURE' ? "[ CRITICAL: BREACH DETECTED ]" : "[ " + state.vault.status + " ]";
-                    vVal.innerText = Math.max(0, Math.floor(state.vault.remaining)) + " / 10000 TB"; 
-                    vVal.style.color = '#ff1744'; vVal.style.textShadow = '0 0 15px #ff1744'; vStat.style.color = '#ff1744'; 
+                    vVal.innerText = Math.max(0, Math.floor(state.vault.remaining)) + " / 10000 TB";
+                    vVal.style.color = '#ff1744'; vVal.style.textShadow = '0 0 15px #ff1744'; vStat.style.color = '#ff1744';
                 } else {
                     vStat.innerText = "[ SECURE ]";
-                    vVal.innerText = "10000 / 10000 TB"; 
-                    vVal.style.color = '#fff'; vVal.style.textShadow = '0 0 15px #00f3ff'; vStat.style.color = '#00f3ff'; 
+                    vVal.innerText = "10000 / 10000 TB";
+                    vVal.style.color = '#fff'; vVal.style.textShadow = '0 0 15px #00f3ff'; vStat.style.color = '#00f3ff';
                 }
             }
 
@@ -1039,8 +1301,15 @@
 
             renderer.render(scene, camera);
         }
-        
+
         animate();
     </script>
+    <script>
+    function goToReport() {
+        // FIX: Changed from '/report' to 'report.html' (assuming that's your filename!)
+       window.location.href = '/report';
+    }
+</script>
 </body>
+
 </html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darktrace AI - UI Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles for Gradients and Glows */
+        body {
+            background-color: #030712;
+            /* Simulating the cosmic/tech background */
+            background-image:
+                radial-gradient(circle at top right, rgba(147, 51, 234, 0.15), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(37, 99, 235, 0.15), transparent 40%);
+            color: #ffffff;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #3b82f6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(to right, #2563eb, #9333ea);
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            opacity: 0.9;
+        }
+
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(147, 51, 234, 0.3);
+        }
+
+        .shield-glow {
+            filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.6));
+        }
+    </style>
+</head>
+
+<body class="p-8 md:p-16 flex flex-col justify-center items-center">
+
+    <div class="max-w-7xl w-full">
+        <header class="mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-wider mb-2">
+                DARKTRACE<span class="text-gradient">AI</span>
+            </h1>
+            <p class="text-gray-400 tracking-widest text-sm uppercase font-semibold">
+                AI Powered Cybersecurity
+            </p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+
+            <div class="space-y-6">
+                <h2 class="text-4xl md:text-5xl font-bold leading-tight">
+                    AI-POWERED CYBERSECURITY <br>
+                    THAT <span class="text-gradient">STAYS AHEAD</span>
+                </h2>
+                <p class="text-gray-400 text-lg max-w-lg leading-relaxed">
+                    DarkTraceAI uses advanced machine learning to detect, analyze, and respond to cyber threats in
+                    real-time. Intelligent protection for a digital world that never stops.
+                </p>
+
+                <div class="flex flex-wrap gap-4 pt-4">
+
+                    <!-- Register Button -->
+                    <a href="register.html"
+                        class="btn-gradient px-8 py-3 rounded-lg font-medium flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        Register Now
+                    </a>
+
+                    <!-- Login Button -->
+                    <a href="login.html"
+                        class="px-8 py-3 rounded-lg font-medium flex items-center gap-2 border border-gray-600 hover:border-gray-400 transition-colors bg-gray-900 bg-opacity-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        Login
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="flex justify-center items-center">
+                <svg class="w-64 h-64 md:w-80 md:h-80 shield-glow text-blue-500" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 10V3L4 14h7v7l9-11h-7z"
+                        stroke="#60a5fa" fill="rgba(96, 165, 250, 0.2)"></path>
+                </svg>
+            </div>
+        </main>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <div class="glass-card p-6 flex flex-col items-start relative overflow-hidden group">
+                <div
+                    class="absolute bottom-0 left-6 w-12 h-1 bg-purple-500 rounded-t-md opacity-50 group-hover:opacity-100 transition-opacity">
+                </div>
+                <div class="p-3 bg-purple-900 bg-opacity-30 rounded-lg mb-4 text-purple-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">AI-Powered Detection</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Advanced ML models identify threats with high accuracy
+                    before they cause damage.</p>
+            </div>
+
+            <div class="glass-card p-6 flex flex-col items-start relative overflow-hidden group">
+                <div
+                    class="absolute bottom-0 left-6 w-12 h-1 bg-blue-500 rounded-t-md opacity-50 group-hover:opacity-100 transition-opacity">
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-30 rounded-lg mb-4 text-blue-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">Real-Time Monitoring</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">24/7 continuous monitoring of your systems, network,
+                    and applications.</p>
+            </div>
+
+            <div class="glass-card p-6 flex flex-col items-start relative overflow-hidden group">
+                <div
+                    class="absolute bottom-0 left-6 w-12 h-1 bg-pink-500 rounded-t-md opacity-50 group-hover:opacity-100 transition-opacity">
+                </div>
+                <div class="p-3 bg-pink-900 bg-opacity-30 rounded-lg mb-4 text-pink-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">Instant Response</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Automated alerts and actionable insights for faster
+                    incident response.</p>
+            </div>
+
+            <div class="glass-card p-6 flex flex-col items-start relative overflow-hidden group">
+                <div
+                    class="absolute bottom-0 left-6 w-12 h-1 bg-cyan-500 rounded-t-md opacity-50 group-hover:opacity-100 transition-opacity">
+                </div>
+                <div class="p-3 bg-cyan-900 bg-opacity-30 rounded-lg mb-4 text-cyan-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">Smart Analytics</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Deep analytics and reports to strengthen your security
+                    strategy and decisions.</p>
+            </div>
+
+        </section>
+    </div>
+
+</body>
+
+</html>

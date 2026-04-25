@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cyber Shield – AI Powered Security</title>
+    <link rel="stylesheet" href="../static/home.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body>
+
+    <!-- ═══════════ FLOATING HOLOGRAPHIC NAVBAR ═══════════ -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-bolt"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">DarkTraceAI</span>
+                    <span class="brand-sub">AI POWERED SECURITY</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><a href="/">DASHBOARD</a></li>
+                <li><a href="/report">REPORT</a></li>
+                <li><a href="/history">HISTORY</a></li>
+                <li><a href="/firewall">FIREWALL</a></li>
+                <li><a href="/threat">THREATS</a></li>
+                <li><a href="/about">ABOUT</a></li>
+                <li><a href="#">SETTINGS</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="nav-icon-btn"><i class="fas fa-search"></i></button>
+                <button class="nav-icon-btn notify">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <div class="nav-user">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=0a2a5e&color=00c8ff&bold=true"
+                        alt="Admin" />
+                    <div>
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════ MAIN CONTAINER (no sidebar) ═══════════ -->
+    <div class="container">
+
+        <!-- ── MAIN CONTENT ── -->
+        <main class="main-content">
+
+            <!-- STAT CARDS ROW -->
+            <section class="stat-cards">
+
+                <!-- Total Threats -->
+                <div class="stat-card red">
+                    <div class="stat-card-inner">
+                        <div class="stat-top">
+                            <p class="stat-label">TOTAL THREATS</p>
+                            <div class="stat-icon-ring red-ring"><i class="fas fa-exclamation-triangle"></i></div>
+                        </div>
+                        <h2 class="stat-value">1,248</h2>
+                        <p class="stat-change up"><i class="fas fa-arrow-up"></i> 24.5% from yesterday</p>
+                        <div class="radar-wrap">
+                            <canvas id="radarChart1" class="stat-radar"></canvas>
+                            <div class="radar-center-dot red-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Attacks -->
+                <div class="stat-card orange">
+                    <div class="stat-card-inner">
+                        <div class="stat-top">
+                            <p class="stat-label">ACTIVE ATTACKS</p>
+                            <div class="stat-icon-ring orange-ring"><i class="fas fa-bug"></i></div>
+                        </div>
+                        <h2 class="stat-value">24</h2>
+                        <p class="stat-change up"><i class="fas fa-arrow-up"></i> 14.2% from yesterday</p>
+                        <div class="arc-gauge-wrap">
+                            <canvas id="gaugeChart" class="arc-gauge"></canvas>
+                            <div class="gauge-label">24%<br /><span>Load</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Systems Secure -->
+                <div class="stat-card green">
+                    <div class="stat-card-inner">
+                        <div class="stat-top">
+                            <p class="stat-label">SYSTEMS SECURE</p>
+                            <div class="stat-icon-ring green-ring"><i class="fas fa-shield-alt"></i></div>
+                        </div>
+                        <h2 class="stat-value">92.6%</h2>
+                        <p class="stat-change up"><i class="fas fa-arrow-up"></i> 2.4% from yesterday</p>
+                        <div class="ring-progress-wrap">
+                            <svg class="ring-svg" viewBox="0 0 80 80">
+                                <circle class="ring-bg" cx="40" cy="40" r="32" />
+                                <circle class="ring-fill green-ring-fill" cx="40" cy="40" r="32" stroke-dasharray="201"
+                                    stroke-dashoffset="15" />
+                            </svg>
+                            <div class="ring-inner-label">92.6%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EVENT LOG -->
+                <div class="event-log-card">
+                    <div class="event-log-header">
+                        <span>EVENT LOG</span>
+                        <span class="live-dot"><span></span>LIVE</span>
+                    </div>
+                    <ul class="event-list">
+                        <li class="event-item">
+                            <span class="event-icon red"><i class="fas fa-exclamation-triangle"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">DDoS Attack Detected</p>
+                                <p class="event-sub">Firewall-3</p>
+                            </div>
+                            <span class="event-time">10:30:41 AM</span>
+                        </li>
+                        <li class="event-item">
+                            <span class="event-icon orange"><i class="fas fa-bug"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">Malware Activity Detected</p>
+                                <p class="event-sub">Firewall-2</p>
+                            </div>
+                            <span class="event-time">10:29:12 AM</span>
+                        </li>
+                        <li class="event-item">
+                            <span class="event-icon green"><i class="fas fa-shield-alt"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">Phishing Attempt Blocked</p>
+                                <p class="event-sub">Firewall-1</p>
+                            </div>
+                            <span class="event-time">10:28:01 AM</span>
+                        </li>
+                        <li class="event-item">
+                            <span class="event-icon blue"><i class="fas fa-info-circle"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">Suspicious Login Detected</p>
+                                <p class="event-sub">Firewall-4</p>
+                            </div>
+                            <span class="event-time">10:27:32 AM</span>
+                        </li>
+                        <li class="event-item">
+                            <span class="event-icon red"><i class="fas fa-exclamation-triangle"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">DDoS Attack Detected</p>
+                                <p class="event-sub">Firewall-5</p>
+                            </div>
+                            <span class="event-time">10:26:11 AM</span>
+                        </li>
+                        <li class="event-item">
+                            <span class="event-icon orange"><i class="fas fa-radiation"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">Port Scan Attempt</p>
+                                <p class="event-sub">Firewall-1</p>
+                            </div>
+                            <span class="event-time">10:25:44 AM</span>
+                        </li>
+                        <li class="event-item">
+                            <span class="event-icon green"><i class="fas fa-lock"></i></span>
+                            <div class="event-info">
+                                <p class="event-title">Brute Force Blocked</p>
+                                <p class="event-sub">Firewall-3</p>
+                            </div>
+                            <span class="event-time">10:24:33 AM</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- CHARTS ROW -->
+            <section class="charts-row">
+                <!-- Attack Trend Hexagon/Constellation Chart -->
+                <div class="chart-card attack-trend">
+                    <div class="chart-header">
+                        <span>ATTACK TREND <span class="chart-sub">(Last 7 Days)</span></span>
+                        <select class="chart-select">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    <div class="chart-x-labels">
+                        <span>12 May</span><span>13 May</span><span>14 May</span>
+                        <span>15 May</span><span>16 May</span><span>17 May</span><span>18 May</span>
+                    </div>
+                </div>
+
+                <!-- Attacks by Firewall – Top 7 -->
+                <div class="chart-card firewall-bar">
+                    <div class="chart-header">
+                        <span>ATTACKS BY FIREWALL <span class="chart-sub">(Top 7)</span></span>
+                        <select class="chart-select">
+                            <option>All Firewalls</option>
+                        </select>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                    <div class="chart-x-labels bar-labels" id="barXLabels">
+                        <span>FW-1</span><span>FW-2</span><span>FW-3</span><span>FW-4</span>
+                        <span>FW-5</span><span>FW-6</span><span>FW-7</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOTTOM ROW -->
+            <section class="bottom-row">
+                <!-- System Status -->
+                <div class="glass-card bottom-status">
+                    <div class="bottom-status-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <p class="bottom-status-text">All Systems Operational</p>
+                    <p class="bottom-status-time">Last Updated<br />18 May 2025 &nbsp;|&nbsp; 10:30 AM</p>
+                </div>
+
+                <a href="/telemetry" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div class="cta-btn">
+                        <div class="cta-icon"><i class="fas fa-rocket"></i></div>
+                        <div>
+                            <p class="cta-main">GO TO SIMULATION</p>
+                            <p class="cta-sub">Run simulation and test your defense</p>
+                        </div>
+                        <i class="fas fa-chevron-right cta-arrow"></i>
+                    </div>
+                </a>
+
+                <!-- Voice Assistant -->
+                <div class="glass-card voice-panel">
+                    <p class="panel-title">VOICE ASSISTANT</p>
+                    <div class="voice-wave">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <button class="mic-btn"><i class="fas fa-microphone"></i></button>
+                </div>
+
+                <!-- Subtitles -->
+                <div class="glass-card subtitle-panel">
+                    <p class="panel-title">SUBTITLES</p>
+                    <p class="subtitle-listen">Listening...</p>
+                    <p class="subtitle-text">"DDoS attack detected on Firewall-..."</p>
+                    <p class="subtitle-text">"Traffic anomaly rate is high."</p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="../static/charts.js"></script>
+    <script src="../static/main.js"></script>
+</body>
+
+</html>

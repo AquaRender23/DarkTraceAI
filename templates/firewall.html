@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DarkTrace AI – Firewall</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+ <link rel="stylesheet" href="{{ url_for('static', filename='firewall.css') }}">
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
+</head>
+<body>
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">
+      <div class="brand-logo-wrap">
+        <img src="{{ url_for('static', filename='assets/dtlogo.png') }}" 
+     alt="DT" 
+     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <span class="logo-fallback">DT</span>
+      </div>
+      <div class="brand-text-group">
+        <span class="brand-name">DarkTrace<span class="brand-ai">AI</span></span>
+        <span class="brand-sub">AI POWERED SECURITY</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#">DASHBOARD</a></li>
+      <li><a href="#">ML MODEL REPORT</a></li>
+      <li><a href="#">HISTORY</a></li>
+      <li class="active"><a href="#">FIREWALL</a></li>
+      <li><a href="#">THREATS</a></li>
+      <li><a href="#">ABOUT</a></li>
+      <li><a href="#">SETTINGS</a></li>
+      <li><a href="#">REPORT</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn"><i class="fas fa-search"></i></button>
+      <button class="nav-icon-btn notify">
+        <i class="fas fa-bell"></i>
+        <span class="badge">3</span>
+      </button>
+      <div class="nav-user">
+        <div class="nav-user-avatar">AU</div>
+        <div>
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Administrator</span>
+        </div>
+        <i class="fas fa-chevron-down" style="font-size:9px;color:var(--text-dim);margin-left:4px;"></i>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ BODY LAYOUT ═══════════ -->
+<div class="page-body">
+
+  
+
+    <!-- Firewall Status Widget -->
+    <div class="fw-status-widget">
+      <p class="fw-status-title">FIREWALL STATUS</p>
+      <div class="fw-shield-wrap">
+        <div class="fw-shield-rings">
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="ring r3"></div>
+        </div>
+        <div class="fw-shield-icon"><i class="fas fa-shield-halved"></i><i class="fas fa-check fw-check"></i></div>
+      </div>
+      <p class="fw-status-label active-label">Firewall is Active</p>
+      <p class="fw-uptime">Uptime: 15d 7h 42m 18s</p>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main-content">
+
+    <!-- STAT MINI CARDS ROW -->
+    <section class="stat-mini-row">
+
+      <div class="mini-card">
+        <p class="mini-label">TOTAL TRAFFIC</p>
+        <h3 class="mini-value blue">2.45 <span class="mini-unit">TB</span></h3>
+        <p class="mini-change up"><i class="fas fa-arrow-up"></i> 12.4% from yesterday</p>
+        <canvas class="sparkline" id="spark1" data-color="rgba(0,229,255,0.8)" data-fill="rgba(0,229,255,0.12)"></canvas>
+      </div>
+
+      <div class="mini-card">
+        <p class="mini-label">ALLOWED TRAFFIC</p>
+        <h3 class="mini-value green">2.12 <span class="mini-unit">TB</span></h3>
+        <p class="mini-change up"><i class="fas fa-arrow-up"></i> 10.7% from yesterday</p>
+        <canvas class="sparkline" id="spark2" data-color="rgba(0,245,160,0.8)" data-fill="rgba(0,245,160,0.12)"></canvas>
+      </div>
+
+      <div class="mini-card">
+        <p class="mini-label">BLOCKED TRAFFIC</p>
+        <h3 class="mini-value red">338.45 <span class="mini-unit">GB</span></h3>
+        <p class="mini-change down"><i class="fas fa-arrow-up"></i> 18.6% from yesterday</p>
+        <canvas class="sparkline" id="spark3" data-color="rgba(255,58,92,0.8)" data-fill="rgba(255,58,92,0.12)"></canvas>
+      </div>
+
+      <div class="mini-card">
+        <p class="mini-label">ACTIVE CONNECTIONS</p>
+        <h3 class="mini-value blue">8,542</h3>
+        <p class="mini-change up"><i class="fas fa-arrow-up"></i> 8.3% from yesterday</p>
+        <canvas class="sparkline" id="spark4" data-color="rgba(0,229,255,0.8)" data-fill="rgba(0,229,255,0.12)"></canvas>
+      </div>
+
+      <div class="mini-card">
+        <p class="mini-label">BLOCKED ATTACKS</p>
+        <h3 class="mini-value red">1,248</h3>
+        <p class="mini-change down"><i class="fas fa-arrow-up"></i> 24.5% from yesterday</p>
+        <canvas class="sparkline" id="spark5" data-color="rgba(155,81,255,0.8)" data-fill="rgba(155,81,255,0.12)"></canvas>
+      </div>
+
+      <div class="mini-card threat-mini">
+        <p class="mini-label">THREAT PREVENTION</p>
+        <h3 class="mini-value green">92.6%</h3>
+        <p class="mini-change up"><i class="fas fa-arrow-up"></i> 2.4% from yesterday</p>
+        <div class="threat-ring-wrap">
+          <svg class="threat-ring-svg" viewBox="0 0 80 80">
+            <circle class="tr-bg" cx="40" cy="40" r="30"/>
+            <circle class="tr-fill" cx="40" cy="40" r="30" id="threatRing"
+              stroke-dasharray="188.5" stroke-dashoffset="14"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- MID ROW: Traffic Overview + Threat Map -->
+    <section class="mid-row">
+
+      <!-- Traffic Overview Chart -->
+      <div class="glass-card traffic-card">
+        <div class="card-header">
+          <span class="card-title">TRAFFIC OVERVIEW</span>
+          <div class="card-header-right">
+            <select class="card-select">
+              <option>Last 24 Hours</option>
+              <option>Last 7 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="traffic-legend">
+          <span class="legend-dot blue-dot"></span><span class="legend-text">Incoming Traffic</span>
+          <span class="legend-val blue">1.25 <small>TB</small></span>
+          <span style="margin-left:20px"></span>
+          <span class="legend-dot green-dot"></span><span class="legend-text">Outgoing Traffic</span>
+          <span class="legend-val green">1.20 <small>TB</small></span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="trafficChart"></canvas>
+        </div>
+        <div class="traffic-x-labels">
+          <span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span>
+          <span>16:00</span><span>20:00</span><span>24:00</span>
+        </div>
+      </div>
+
+      <!-- Threat Map -->
+      <div class="glass-card threat-map-card">
+        <div class="card-header">
+          <span class="card-title">THREAT MAP</span>
+        </div>
+        <div class="map-wrap">
+          <canvas id="mapCanvas"></canvas>
+          <div class="map-legend">
+            <div class="map-leg-item"><span class="dot critical"></span> Critical</div>
+            <div class="map-leg-item"><span class="dot high"></span> High</div>
+            <div class="map-leg-item"><span class="dot medium"></span> Medium</div>
+            <div class="map-leg-item"><span class="dot low"></span> Low</div>
+            <div class="map-leg-item"><span class="dot info"></span> Info</div>
+          </div>
+          <button class="view-map-btn">View Full Map <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM ROW: Events + Top IPs + Zone Chart -->
+    <section class="bottom-row">
+
+      <!-- Recent Firewall Events -->
+      <div class="glass-card events-card">
+        <div class="card-header">
+          <span class="card-title">RECENT FIREWALL EVENTS</span>
+          <a href="#" class="view-all">View All Logs</a>
+        </div>
+        <table class="events-table">
+          <thead>
+            <tr>
+              <th>TIME</th>
+              <th>EVENT</th>
+              <th>SOURCE IP</th>
+              <th>DESTINATION</th>
+              <th>ACTION</th>
+              <th>SEVERITY</th>
+            </tr>
+          </thead>
+          <tbody id="eventsBody">
+            <tr>
+              <td class="mono">19 May 2025, 07:24:32 PM</td>
+              <td><i class="fas fa-exclamation-triangle text-danger" style="margin-right:6px"></i>DDoS Attack Detected</td>
+              <td class="mono">192.168.1.45</td>
+              <td class="mono">10.0.0.23</td>
+              <td><span class="action-badge blocked">Blocked</span></td>
+              <td><span class="severity-badge sv-critical">Critical</span></td>
+            </tr>
+            <tr>
+              <td class="mono">19 May 2025, 07:22:14 PM</td>
+              <td><i class="fas fa-bug text-warning" style="margin-right:6px"></i>Malware Activity Blocked</td>
+              <td class="mono">192.168.1.123</td>
+              <td class="mono">10.0.0.8</td>
+              <td><span class="action-badge blocked">Blocked</span></td>
+              <td><span class="severity-badge sv-high">High</span></td>
+            </tr>
+            <tr>
+              <td class="mono">19 May 2025, 07:20:44 PM</td>
+              <td><i class="fas fa-radiation text-warning" style="margin-right:6px"></i>Port Scan Attempt</td>
+              <td class="mono">192.168.1.66</td>
+              <td class="mono">10.0.0.10</td>
+              <td><span class="action-badge blocked">Blocked</span></td>
+              <td><span class="severity-badge sv-medium">Medium</span></td>
+            </tr>
+            <tr>
+              <td class="mono">19 May 2025, 07:18:44 PM</td>
+              <td><i class="fas fa-key" style="margin-right:6px;color:#ffaa00"></i>Suspicious Login Attempt</td>
+              <td class="mono">203.0.113.7</td>
+              <td class="mono">10.0.0.5</td>
+              <td><span class="action-badge blocked">Blocked</span></td>
+              <td><span class="severity-badge sv-medium">Medium</span></td>
+            </tr>
+            <tr>
+              <td class="mono">19 May 2025, 07:15:32 PM</td>
+              <td><i class="fas fa-check text-success" style="margin-right:6px"></i>New Connection Allowed</td>
+              <td class="mono">192.168.1.50</td>
+              <td class="mono">10.0.0.25</td>
+              <td><span class="action-badge allowed">Allowed</span></td>
+              <td><span class="severity-badge sv-info">Info</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-col">
+
+        <!-- Top Blocked IPs -->
+        <div class="glass-card ips-card">
+          <div class="card-header">
+            <span class="card-title">TOP BLOCKED IPS</span>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="ip-list">
+            <div class="ip-item">
+              <span class="ip-rank">1</span>
+              <span class="ip-addr mono">203.0.113.7</span>
+              <div class="ip-bar-wrap"><div class="ip-bar" style="width:82%;background:linear-gradient(90deg,#ff3a5c,#ff6680);box-shadow:0 0 8px rgba(255,58,92,0.6)"></div></div>
+              <span class="ip-count">324</span>
+            </div>
+            <div class="ip-item">
+              <span class="ip-rank">2</span>
+              <span class="ip-addr mono">198.51.100.23</span>
+              <div class="ip-bar-wrap"><div class="ip-bar" style="width:70%;background:linear-gradient(90deg,#ff6a00,#ffaa00);box-shadow:0 0 8px rgba(255,106,0,0.6)"></div></div>
+              <span class="ip-count">287</span>
+            </div>
+            <div class="ip-item">
+              <span class="ip-rank">3</span>
+              <span class="ip-addr mono">185.220.101.12</span>
+              <div class="ip-bar-wrap"><div class="ip-bar" style="width:47%;background:linear-gradient(90deg,#ffdd00,#ffe866);box-shadow:0 0 8px rgba(255,220,0,0.6)"></div></div>
+              <span class="ip-count">156</span>
+            </div>
+            <div class="ip-item">
+              <span class="ip-rank">4</span>
+              <span class="ip-addr mono">192.0.2.45</span>
+              <div class="ip-bar-wrap"><div class="ip-bar" style="width:30%;background:linear-gradient(90deg,#00e396,#00f5a0);box-shadow:0 0 8px rgba(0,227,150,0.6)"></div></div>
+              <span class="ip-count">98</span>
+            </div>
+            <div class="ip-item">
+              <span class="ip-rank">5</span>
+              <span class="ip-addr mono">203.0.113.89</span>
+              <div class="ip-bar-wrap"><div class="ip-bar" style="width:22%;background:linear-gradient(90deg,#00c8ff,#00e5ff);box-shadow:0 0 8px rgba(0,200,255,0.6)"></div></div>
+              <span class="ip-count">76</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Traffic by Zone -->
+        <div class="glass-card zone-card">
+          <div class="card-header">
+            <span class="card-title">TRAFFIC BY ZONE</span>
+          </div>
+          <div class="zone-body">
+            <div class="zone-chart-wrap">
+              <canvas id="zoneChart"></canvas>
+              <div class="zone-center">
+                <span class="zone-center-val">2.45</span>
+                <span class="zone-center-unit">TB</span>
+              </div>
+            </div>
+            <div class="zone-legend">
+              <div class="zone-leg"><span class="zdot" style="background:#2196f3"></span><span>DMZ Zone</span><span class="zpct">35% (858 GB)</span></div>
+              <div class="zone-leg"><span class="zdot" style="background:#00e396"></span><span>Internal Zone</span><span class="zpct">45% (1.1 TB)</span></div>
+              <div class="zone-leg"><span class="zdot" style="background:#ffaa00"></span><span>External Zone</span><span class="zpct">15% (367 GB)</span></div>
+              <div class="zone-leg"><span class="zdot" style="background:#9b51ff"></span><span>VPN Zone</span><span class="zpct">5% (122 GB)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Firewall Rules Summary -->
+    <section class="rules-row">
+      <div class="glass-card rules-card">
+        <div class="card-header">
+          <span class="card-title">FIREWALL RULES SUMMARY</span>
+        </div>
+        <div class="rules-body">
+          <div class="rule-item">
+            <div class="rule-icon blue-icon"><i class="fas fa-list-ul"></i></div>
+            <div class="rule-info">
+              <p class="rule-label">Total Rules</p>
+              <p class="rule-val blue">128</p>
+            </div>
+          </div>
+          <div class="rule-divider"></div>
+          <div class="rule-item">
+            <div class="rule-icon green-icon"><i class="fas fa-shield-check"></i></div>
+            <div class="rule-info">
+              <p class="rule-label">Active Rules</p>
+              <p class="rule-val green">112</p>
+            </div>
+          </div>
+          <div class="rule-divider"></div>
+          <div class="rule-item">
+            <div class="rule-icon orange-icon"><i class="fas fa-circle-pause"></i></div>
+            <div class="rule-info">
+              <p class="rule-label">Disabled Rules</p>
+              <p class="rule-val orange">16</p>
+            </div>
+          </div>
+          <div class="rule-divider"></div>
+          <div class="rule-item">
+            <div class="rule-icon purple-icon"><i class="fas fa-shield-halved"></i></div>
+            <div class="rule-info">
+              <p class="rule-label">Default Deny</p>
+              <p class="rule-val purple">Enabled</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
+</body>
+</html>

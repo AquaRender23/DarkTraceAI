@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from flask import render_template
 from flask_socketio import SocketIO, emit  # <-- ADDED 'emit' HERE
 from xgboost import XGBClassifier
 import joblib
@@ -7,7 +8,9 @@ import os
 import pandas as pd
 import numpy as np
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder="../templates",
+            static_folder="../static")
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -29,12 +32,42 @@ feature_template = joblib.load(features_path)
 print("✅ Model v4 loaded!")
 print("📊 Features:", feature_template)
 
-# =========================
-# HEALTH CHECK (FIXED)
-# =========================
+
 @app.route('/')
 def home():
-    return {"status": "Backend running with Model v4"}
+    return render_template('home.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+@app.route('/report')
+def report():
+    return render_template('report.html')
+
+
+@app.route('/history')
+def history():
+    return render_template('history.html')
+
+
+@app.route('/firewall')
+def firewall():
+    return render_template('firewall.html')
+
+
+@app.route('/threat')
+def threat():
+    return render_template('threat.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 # =========================
 # ANALYZE API

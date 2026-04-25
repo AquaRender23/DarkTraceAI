@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2>FILTERS</h2>
+
+        <label>Time Range</label>
+        <select><option>Last 30 Days</option></select>
+
+        <label>Category</label>
+        <select><option>All Categories</option></select>
+
+        <label>Severity</label>
+        <select><option>All Severity</option></select>
+
+        <div class="menu">
+            <div class="active">All Activities</div>
+            <div>Security Events</div>
+            <div>User Actions</div>
+            <div>System Events</div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <h1>SYSTEM HISTORY</h1>
+
+        <!-- STATS -->
+        <div class="stats">
+            <div class="card"><span>18,742</span><p>Total Activities</p></div>
+            <div class="card"><span>2,934</span><p>User Actions</p></div>
+            <div class="card"><span>9,218</span><p>System Events</p></div>
+            <div class="card"><span>1,387</span><p>Config Changes</p></div>
+        </div>
+
+        <div class="grid">
+
+            <!-- TIMELINE -->
+            <div class="panel timeline">
+                <h3>Activity Timeline</h3>
+
+                <div class="event high">DDoS Attack Detected & Blocked</div>
+                <div class="event medium">Malware Activity Detected</div>
+                <div class="event medium">Phishing Attempt Blocked</div>
+                <div class="event low">Brute Force Attack Blocked</div>
+                <div class="event info">Admin Login Successful</div>
+            </div>
+
+            <!-- DONUT -->
+            <div class="panel">
+                <h3>Activity Overview</h3>
+                <canvas id="severityChart"></canvas>
+            </div>
+
+            <!-- LINE -->
+            <div class="panel full">
+                <h3>Activity Trends</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
+
+</body>
+</html>
